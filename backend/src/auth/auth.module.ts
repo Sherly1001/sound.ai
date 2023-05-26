@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { DeviceModule } from 'src/api/device/device.module';
 import { UserModule } from 'src/api/user/user.module';
 import { AppConfig } from 'src/config';
 import { AuthService } from './auth.service';
@@ -8,6 +9,7 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     forwardRef(() => UserModule),
+    forwardRef(() => DeviceModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

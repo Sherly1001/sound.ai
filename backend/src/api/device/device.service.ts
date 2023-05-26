@@ -1,0 +1,34 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PartialDevice } from 'src/dtos/device.dto';
+import { Device } from 'src/schema/entities/device.entity';
+import { Repository } from 'typeorm';
+
+@Injectable()
+export class DeviceService {
+  constructor(
+    @InjectRepository(Device) private readonly deviceRepo: Repository<Device>,
+  ) {}
+
+  async getDevices() {
+    return await this.deviceRepo.find();
+  }
+
+  async create(deviceName: string, password: string) {
+    const dev = this.deviceRepo.create({ deviceName, hashPassword: password });
+    return await this.deviceRepo.save(dev);
+  }
+
+  async verifyDevice(deviceName: string, password: string) {
+    const dev = await this.deviceRepo.findOneBy({ deviceName });
+    if (!dev || !dev.checkPassword(password)) return null;
+    return dev;
+  }
+
+  async updateDev(deviceId: string, payload: PartialDevice) {
+    const user = await this.deviceRepo.findOneBy({ deviceId });
+    if (!user) throw new NotFoundException(`DeviceId ${deviceId} not found`);
+    const newDev = Object.assign(new Device(), { ...user, ...payload });
+    return await this.deviceRepo.save(newDev);
+  }
+}

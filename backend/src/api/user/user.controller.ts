@@ -52,7 +52,14 @@ export class UserController {
 
   @ApiOkResponse({
     schema: {
-      $ref: getSchemaPath(BaseResult),
+      allOf: [
+        { $ref: getSchemaPath(BaseResult) },
+        {
+          properties: {
+            data: { type: 'string' },
+          },
+        },
+      ],
     },
   })
   @Post('login')
