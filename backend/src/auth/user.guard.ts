@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { AuthUserPayload } from 'src/dtos/auth-user-payload.dto';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -19,7 +20,12 @@ export class UserGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token);
+      const payload: AuthUserPayload = await this.jwtService.verifyAsync(token);
+
+      if (!payload.userId) {
+        throw new UnauthorizedException('missing userId');
+      }
+
       request['user'] = payload;
     } catch (err) {
       throw new UnauthorizedException(err.toString());

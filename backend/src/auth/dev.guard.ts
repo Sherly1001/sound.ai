@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { AuthDevicePayload } from 'src/dtos/auth-device-payload.dto';
 
 @Injectable()
 export class DeviceGuard implements CanActivate {
@@ -19,7 +20,14 @@ export class DeviceGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token);
+      const payload: AuthDevicePayload = await this.jwtService.verifyAsync(
+        token,
+      );
+
+      if (!payload.deviceId) {
+        throw new UnauthorizedException('missing deviceId');
+      }
+
       request['dev'] = payload;
     } catch (err) {
       throw new UnauthorizedException(err.toString());
