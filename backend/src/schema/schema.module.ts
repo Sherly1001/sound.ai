@@ -12,7 +12,7 @@ import entities from './entities';
       useFactory: (cfg: ConfigService<AppConfig, true>) => ({
         type: 'postgres',
         url: cfg.get('database.url', { infer: true }),
-        logging: true,
+        logging: cfg.get('database.log', { infer: true }),
         synchronize: true,
         entities: entities,
       }),
