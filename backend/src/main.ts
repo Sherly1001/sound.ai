@@ -4,10 +4,13 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AppConfig } from './config';
+import { ResultWapper } from './filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const cfg = app.get(ConfigService<AppConfig, true>);
+
+  app.useGlobalFilters(new ResultWapper());
 
   const doc = new DocumentBuilder()
     .setTitle('Sound.AI')

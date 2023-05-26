@@ -43,15 +43,11 @@ export class UserController {
   })
   @Post('create')
   async createUser(@Res() res: Response, @Body() body: UserDto) {
-    try {
-      const result = await this.userService.createUser(
-        body.username,
-        body.password,
-      );
-      new BaseResult(result, HttpStatus.OK).toResponse(res);
-    } catch (err) {
-      new BaseResult(err).toResponse(res);
-    }
+    const result = await this.userService.createUser(
+      body.username,
+      body.password,
+    );
+    new BaseResult(result, HttpStatus.OK).toResponse(res);
   }
 
   @ApiOkResponse({
@@ -61,15 +57,11 @@ export class UserController {
   })
   @Post('login')
   async login(@Res() res: Response, @Body() body: UserDto) {
-    try {
-      const token = await this.authService.userLogin(
-        body.username,
-        body.password,
-      );
-      new BaseResult(token).toResponse(res);
-    } catch (err) {
-      new BaseResult(err).toResponse(res);
-    }
+    const token = await this.authService.userLogin(
+      body.username,
+      body.password,
+    );
+    new BaseResult(token).toResponse(res);
   }
 
   @ApiOkResponse({
@@ -88,15 +80,11 @@ export class UserController {
     @Res() res: Response,
     @Body() body: UserUpdateDto,
   ) {
-    try {
-      const user: AuthUserPayload = req['user'];
-      const result = await this.userService.updateUser(
-        user.userId,
-        UserDto.toHashPassword(body),
-      );
-      new BaseResult(result).toResponse(res);
-    } catch (err) {
-      new BaseResult(err).toResponse(res);
-    }
+    const user: AuthUserPayload = req['user'];
+    const result = await this.userService.updateUser(
+      user.userId,
+      UserDto.toHashPassword(body),
+    );
+    new BaseResult(result).toResponse(res);
   }
 }
