@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../config';
 import entities from './entities';
+import migrations from './migrations';
 
 @Module({
   imports: [
@@ -13,8 +14,10 @@ import entities from './entities';
         type: 'postgres',
         url: cfg.get('database.url', { infer: true }),
         logging: cfg.get('database.log', { infer: true }),
-        synchronize: true,
         entities: entities,
+        migrations: migrations,
+        synchronize: true,
+        migrationsRun: true,
       }),
     }),
   ],

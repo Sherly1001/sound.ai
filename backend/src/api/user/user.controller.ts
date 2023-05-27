@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  HttpStatus,
   Post,
   Put,
   Req,
@@ -47,7 +46,7 @@ export class UserController {
       body.username,
       body.password,
     );
-    new BaseResult(result, HttpStatus.OK).toResponse(res);
+    new BaseResult(result).toResponse(res);
   }
 
   @ApiOkResponse({

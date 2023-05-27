@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpStatus,
   Post,
   Put,
   Req,
@@ -66,7 +65,7 @@ export class DeviceController {
       body.deviceName,
       body.password,
     );
-    new BaseResult(result, HttpStatus.OK).toResponse(res);
+    new BaseResult(result).toResponse(res);
   }
 
   @ApiOkResponse({

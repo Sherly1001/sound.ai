@@ -20,7 +20,7 @@ export class Model {
   type: ModelType;
 
   @ApiProperty()
-  @Column()
+  @Column({ unique: true })
   modelName: string;
 
   @ApiProperty()
@@ -28,6 +28,6 @@ export class Model {
   modelFilePath: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 }

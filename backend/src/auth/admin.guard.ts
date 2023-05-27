@@ -7,7 +7,7 @@ import {
 import { AuthUserPayload } from 'src/dtos/auth-user-payload.dto';
 
 @Injectable()
-export class UserGuard implements CanActivate {
+export class AdminGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const payload = request['user'] as AuthUserPayload;

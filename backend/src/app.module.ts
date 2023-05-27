@@ -4,6 +4,7 @@ import { ApiModule } from './api/api.module';
 import { AuthModule } from './auth/auth.module';
 import config from './config';
 import { SchemaModule } from './schema/schema.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SchemaModule } from './schema/schema.module';
     SchemaModule,
     ApiModule,
     AuthModule,
+    StorageModule,
   ],
   controllers: [],
   providers: [],

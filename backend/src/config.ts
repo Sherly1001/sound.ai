@@ -8,6 +8,9 @@ export class AppConfig {
     secret: string;
     expiresIn: string;
   };
+  storage: {
+    dir: string;
+  };
 }
 
 function config(): AppConfig {
@@ -20,6 +23,9 @@ function config(): AppConfig {
     jwt: {
       secret: process.env.JWT_SECRET_KEY || '',
       expiresIn: process.env.JWT_EXPIRE || '60 days',
+    },
+    storage: {
+      dir: process.env.STORAGE_DIRECTORY || './data',
     },
   };
 }
