@@ -44,4 +44,9 @@ export class UserService {
 
     return await this.userRepo.save(newUser);
   }
+
+  async deleteUser(userId: string) {
+    const user = await this.userRepo.findOneBy({ userId });
+    return await this.userRepo.remove(user);
+  }
 }

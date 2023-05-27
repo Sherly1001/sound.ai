@@ -26,9 +26,14 @@ export class DeviceService {
   }
 
   async updateDev(deviceId: string, payload: PartialDevice) {
-    const user = await this.deviceRepo.findOneBy({ deviceId });
-    if (!user) throw new NotFoundException(`DeviceId ${deviceId} not found`);
-    const newDev = Object.assign(new Device(), { ...user, ...payload });
+    const dev = await this.deviceRepo.findOneBy({ deviceId });
+    if (!dev) throw new NotFoundException(`DeviceId ${deviceId} not found`);
+    const newDev = Object.assign(new Device(), { ...dev, ...payload });
     return await this.deviceRepo.save(newDev);
+  }
+
+  async deleteDev(deviceId: string) {
+    const dev = await this.deviceRepo.findOneBy({ deviceId });
+    return await this.deviceRepo.remove(dev);
   }
 }

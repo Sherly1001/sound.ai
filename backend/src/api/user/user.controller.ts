@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Post,
   Put,
   Req,
@@ -91,6 +92,23 @@ export class UserController {
       user.userId,
       UserDto.toHashPassword(body),
     );
+    new BaseResult(result).toResponse(res);
+  }
+
+  @ApiOkResponse({
+    schema: {
+      $ref: getSchemaPath(BaseResult),
+      properties: {
+        data: { $ref: getSchemaPath(User) },
+      },
+    },
+  })
+  @UseGuards(UserGuard)
+  @ApiBearerAuth('userAuth')
+  @Delete('remove')
+  async delete(@Req() req: Request, @Res() res: Response) {
+    const user: AuthUserPayload = req['user'];
+    const result = await this.userService.deleteUser(user.userId);
     new BaseResult(result).toResponse(res);
   }
 }

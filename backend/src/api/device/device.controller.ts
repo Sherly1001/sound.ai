@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Put,
@@ -110,6 +111,23 @@ export class DeviceController {
       dev.deviceId,
       DeviceDto.toHashPassword(body),
     );
+    new BaseResult(result).toResponse(res);
+  }
+
+  @ApiOkResponse({
+    schema: {
+      $ref: getSchemaPath(BaseResult),
+      properties: {
+        data: { $ref: getSchemaPath(Device) },
+      },
+    },
+  })
+  @UseGuards(DeviceGuard)
+  @ApiBearerAuth('devAuth')
+  @Delete('remove')
+  async delete(@Req() req: Request, @Res() res: Response) {
+    const dev: AuthDevicePayload = req['dev'];
+    const result = await this.deviceService.deleteDev(dev.deviceId);
     new BaseResult(result).toResponse(res);
   }
 }
