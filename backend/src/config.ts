@@ -3,6 +3,8 @@ export class AppConfig {
   database: {
     url: string;
     log: boolean;
+    enableSync: boolean;
+    runMigrations: boolean;
   };
   jwt: {
     secret: string;
@@ -19,6 +21,8 @@ function config(): AppConfig {
     database: {
       url: process.env.DATABASE_URL || '',
       log: process.env.DATABASE_LOG == 'true',
+      enableSync: process.env.DATABASE_SYNC == 'true',
+      runMigrations: process.env.DATABASE_RUN_MIGRATIONS == 'true',
     },
     jwt: {
       secret: process.env.JWT_SECRET_KEY || '',
