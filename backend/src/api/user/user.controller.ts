@@ -21,7 +21,7 @@ import { UserGuard } from 'src/auth/user.guard';
 import { AuthUserPayload } from 'src/dtos/auth-user-payload.dto';
 import { BaseResult } from 'src/dtos/base-result.dto';
 import { UserDto, UserUpdateDto } from 'src/dtos/user.dto';
-import { User } from 'src/schema/entities/user.entity';
+import { User } from 'src/schema/entities';
 import { UserService } from './user.service';
 
 @ApiTags(UserController.name)

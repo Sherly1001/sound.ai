@@ -24,8 +24,7 @@ import { AdminGuard } from 'src/auth/admin.guard';
 import { UserGuard } from 'src/auth/user.guard';
 import { BaseResult } from 'src/dtos/base-result.dto';
 import { ModelUploadDto } from 'src/dtos/model.dto';
-import { ModelType } from 'src/schema/entities/model-type.entity';
-import { Model } from 'src/schema/entities/model.entity';
+import { Model, ModelType } from 'src/schema/entities';
 import { ModelService } from './model.service';
 
 @ApiTags(ModelController.name)

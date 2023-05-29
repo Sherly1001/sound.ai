@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RecordUploadDto } from 'src/dtos/record.dto';
-import { Device } from 'src/schema/entities/device.entity';
-import { Record } from 'src/schema/entities/record.entity';
+import { Device, Record } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
 

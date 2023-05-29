@@ -28,7 +28,7 @@ import { UserGuard } from 'src/auth/user.guard';
 import { AuthDevicePayload } from 'src/dtos/auth-device-payload.dto';
 import { BaseResult } from 'src/dtos/base-result.dto';
 import { RecordUploadDto } from 'src/dtos/record.dto';
-import { Record } from 'src/schema/entities/record.entity';
+import { Record } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
 import { RecordService } from './record.service';
 

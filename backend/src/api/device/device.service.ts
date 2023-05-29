@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartialDevice } from 'src/dtos/device.dto';
-import { Device } from 'src/schema/entities/device.entity';
+import { Device } from 'src/schema/entities';
 import { Repository } from 'typeorm';
 
 @Injectable()

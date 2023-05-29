@@ -1,8 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
-import { Device } from 'src/schema/entities/device.entity';
-import { Record } from 'src/schema/entities/record.entity';
+import { Device, Record } from 'src/schema/entities';
 import { StorageModule } from 'src/storage/storage.module';
 import { RecordController } from './record.controller';
 import { RecordService } from './record.service';

@@ -22,7 +22,7 @@ import { DeviceGuard } from 'src/auth/dev.guard';
 import { AuthDevicePayload } from 'src/dtos/auth-device-payload.dto';
 import { BaseResult } from 'src/dtos/base-result.dto';
 import { DeviceDto, DeviceUpdateDto } from 'src/dtos/device.dto';
-import { Device } from 'src/schema/entities/device.entity';
+import { Device } from 'src/schema/entities';
 import { DeviceService } from './device.service';
 
 @ApiTags(DeviceController.name)
