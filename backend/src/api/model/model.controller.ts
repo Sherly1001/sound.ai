@@ -71,6 +71,46 @@ export class ModelController {
 
   @ApiOkResponse({
     schema: {
+      allOf: [
+        { $ref: getSchemaPath(BaseResult) },
+        {
+          properties: {
+            data: { type: 'array', items: { $ref: getSchemaPath(ModelType) } },
+          },
+        },
+      ],
+    },
+  })
+  @UseGuards(UserGuard, AdminGuard)
+  @ApiBearerAuth('adminAuth')
+  @Post('create-type/:typeName')
+  async createType(@Res() res: Response, @Param('typeName') typeName: string) {
+    const result = await this.modelService.createModelType(typeName);
+    new BaseResult(result).toResponse(res);
+  }
+
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(BaseResult) },
+        {
+          properties: {
+            data: { type: 'array', items: { $ref: getSchemaPath(ModelType) } },
+          },
+        },
+      ],
+    },
+  })
+  @UseGuards(UserGuard, AdminGuard)
+  @ApiBearerAuth('adminAuth')
+  @Delete('remove-type/:typeId')
+  async removeType(@Res() res: Response, @Param('typeId') typeId: string) {
+    const result = await this.modelService.removeModelType(typeId);
+    new BaseResult(result).toResponse(res);
+  }
+
+  @ApiOkResponse({
+    schema: {
       type: 'string',
       format: 'binary',
     },

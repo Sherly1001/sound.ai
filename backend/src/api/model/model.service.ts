@@ -21,6 +21,16 @@ export class ModelService {
     return await this.modelTypeRepo.find();
   }
 
+  async createModelType(typeName: string) {
+    const type = this.modelTypeRepo.create({ typeName });
+    return await this.modelTypeRepo.save(type);
+  }
+
+  async removeModelType(typeId: string) {
+    const type = await this.modelTypeRepo.findOneBy({ typeId });
+    return await this.modelTypeRepo.remove(type);
+  }
+
   async downloadModel(modelId: string) {
     const model = await this.modelRepo.findOneBy({ modelId });
     if (!model) {
