@@ -16,6 +16,7 @@ async function bootstrap() {
     .setTitle('Sound.AI')
     .setDescription('The APIs for sound.ai')
     .addBearerAuth({ type: 'http' }, 'userAuth')
+    .addBearerAuth({ type: 'http' }, 'adminAuth')
     .addBearerAuth({ type: 'http' }, 'devAuth')
     .build();
 

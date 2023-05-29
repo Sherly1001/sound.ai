@@ -26,17 +26,13 @@ import { BaseResult } from 'src/dtos/base-result.dto';
 import { ModelUploadDto } from 'src/dtos/model.dto';
 import { ModelType } from 'src/schema/entities/model-type.entity';
 import { Model } from 'src/schema/entities/model.entity';
-import { StorageService } from 'src/storage/storage.service';
 import { ModelService } from './model.service';
 
 @ApiTags(ModelController.name)
 @ApiExtraModels(BaseResult, Model)
 @Controller('model')
 export class ModelController {
-  constructor(
-    private readonly storageService: StorageService,
-    private readonly modelService: ModelService,
-  ) {}
+  constructor(private readonly modelService: ModelService) {}
 
   @ApiOkResponse({
     schema: {
@@ -128,7 +124,7 @@ export class ModelController {
     },
   })
   @UseGuards(UserGuard, AdminGuard)
-  @ApiBearerAuth('userAuth')
+  @ApiBearerAuth('adminAuth')
   @Delete('remove/:modelId')
   async delete(@Res() res: Response, @Param('modelId') modelId: string) {
     const result = await this.modelService.removeModel(modelId);
