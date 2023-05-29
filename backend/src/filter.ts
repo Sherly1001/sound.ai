@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -23,7 +24,7 @@ export class ResultWapper implements ExceptionFilter {
         exception.driverError.detail ?? exception.message,
       );
     } else {
-      err = exception.toString();
+      err = new InternalServerErrorException(exception.message);
     }
 
     new BaseResult(err).toResponse(res);

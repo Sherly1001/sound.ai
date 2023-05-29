@@ -106,7 +106,7 @@ export class ModelController {
     const result = await this.modelService.uploadModel(
       model.modelName,
       model.typeId,
-      file.buffer,
+      file,
     );
     new BaseResult(result).toResponse(res);
   }

@@ -10,7 +10,9 @@ export class StorageService {
   private readonly logger = new Logger(StorageService.name);
   private readonly pwd: string;
   private readonly dirs = {
+    audio: 'audio',
     models: 'models',
+    images: 'images',
   };
 
   constructor(private readonly cfg: ConfigService<AppConfig, true>) {
@@ -47,16 +49,34 @@ export class StorageService {
     return await this.getFile(modelFilePath);
   }
 
-  async saveFile(dir: string, content: Buffer) {
-    const fileName = randomUUID();
+  async getAudio(audioFileName: string) {
+    const audioFilePath = path.join(this.pwd, this.dirs.audio, audioFileName);
+    return await this.getFile(audioFilePath);
+  }
+
+  async getImage(imageFileName: string) {
+    const imageFilePath = path.join(this.pwd, this.dirs.images, imageFileName);
+    return await this.getFile(imageFilePath);
+  }
+
+  async saveFile(dir: string, file: Express.Multer.File) {
+    const fileName = randomUUID() + path.extname(file.originalname);
     const filePath = path.join(this.pwd, dir, fileName);
-    fs.writeFileSync(filePath, content);
+    fs.writeFileSync(filePath, file.buffer);
     this.logger.debug(`saved file: ${filePath}`);
     return fileName;
   }
 
-  async saveModel(content: Buffer) {
-    return this.saveFile(this.dirs.models, content);
+  async saveModel(file: Express.Multer.File) {
+    return this.saveFile(this.dirs.models, file);
+  }
+
+  async saveAudio(file: Express.Multer.File) {
+    return this.saveFile(this.dirs.audio, file);
+  }
+
+  async saveImage(file: Express.Multer.File) {
+    return this.saveFile(this.dirs.images, file);
   }
 
   async removeFile(dir: string, name: string) {
@@ -71,5 +91,13 @@ export class StorageService {
 
   async removeModel(modelFilePath: string) {
     return this.removeFile(this.dirs.models, modelFilePath);
+  }
+
+  async removeAudio(modelFilePath: string) {
+    return this.removeFile(this.dirs.audio, modelFilePath);
+  }
+
+  async removeImage(modelFilePath: string) {
+    return this.removeFile(this.dirs.images, modelFilePath);
   }
 }

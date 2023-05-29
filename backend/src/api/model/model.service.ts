@@ -30,8 +30,12 @@ export class ModelService {
     return await this.storageService.getModel(model.modelFilePath);
   }
 
-  async uploadModel(modelName: string, typeId: string, fileContent: Buffer) {
-    const modelFilePath = await this.storageService.saveModel(fileContent);
+  async uploadModel(
+    modelName: string,
+    typeId: string,
+    file: Express.Multer.File,
+  ) {
+    const modelFilePath = await this.storageService.saveModel(file);
     try {
       const type = await this.modelTypeRepo.findOneBy({ typeId });
       const model = this.modelRepo.create({ modelName, type, modelFilePath });
