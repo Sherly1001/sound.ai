@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   Entity,
@@ -12,21 +13,26 @@ import { Score } from './score.entity';
 
 @Entity()
 export class DiagnosticResult {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   resultId: string;
 
+  @ApiProperty()
   @JoinColumn()
   @ManyToOne(() => Record)
   record: Record;
 
+  @ApiProperty()
   @JoinColumn()
   @ManyToOne(() => Model)
   model: Model;
 
+  @ApiProperty({ type: [Score] })
   @JoinColumn()
   @OneToMany(() => Score, (score) => score.result)
   scores: Score[];
 
-  @Column()
+  @ApiProperty()
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 }
