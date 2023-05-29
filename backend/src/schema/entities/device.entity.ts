@@ -34,10 +34,12 @@ export class Device {
   @BeforeInsert()
   @BeforeUpdate()
   private encryptPassword() {
-    this.hashPassword = bcrypt.hashSync(
-      this.hashPassword,
-      bcrypt.genSaltSync(),
-    );
+    if (this.hashPassword) {
+      this.hashPassword = bcrypt.hashSync(
+        this.hashPassword,
+        bcrypt.genSaltSync(),
+      );
+    }
   }
 
   public checkPassword(password: string) {

@@ -36,7 +36,7 @@ export class UserService {
   ) {
     const user = await this.userRepo.findOneBy({ userId });
     if (!user) throw new NotFoundException(`UserId ${userId} not found`);
-
+    if (!payload.hashPassword) delete user.hashPassword;
     const newUser = Object.assign(new User(), { ...user, ...payload });
     if (isAdmin) {
       newUser.isAdmin = true;

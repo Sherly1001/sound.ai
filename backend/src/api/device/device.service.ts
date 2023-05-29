@@ -30,6 +30,7 @@ export class DeviceService {
   async updateDev(deviceId: string, payload: PartialDevice) {
     const dev = await this.deviceRepo.findOneBy({ deviceId });
     if (!dev) throw new NotFoundException(`DeviceId ${deviceId} not found`);
+    if (!payload.hashPassword) delete dev.hashPassword;
     const newDev = Object.assign(new Device(), { ...dev, ...payload });
     return await this.deviceRepo.save(newDev);
   }
