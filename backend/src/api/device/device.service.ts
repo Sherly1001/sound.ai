@@ -11,7 +11,9 @@ export class DeviceService {
   ) {}
 
   async getDevices() {
-    return await this.deviceRepo.find();
+    return await this.deviceRepo.find({
+      relations: ['currentModel', 'currentModel.type'],
+    });
   }
 
   async create(deviceName: string, password: string) {

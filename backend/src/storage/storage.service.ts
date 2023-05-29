@@ -61,7 +61,11 @@ export class StorageService {
 
   async removeFile(dir: string, name: string) {
     const filePath = path.join(this.pwd, dir, name);
-    fs.unlinkSync(filePath);
+    try {
+      fs.unlinkSync(filePath);
+    } catch (err) {
+      this.logger.error(err);
+    }
     this.logger.debug(`removed file: ${filePath}`);
   }
 

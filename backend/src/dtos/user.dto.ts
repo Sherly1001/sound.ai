@@ -10,7 +10,7 @@ export class UserDto {
 
   public static toHashPassword(user: ThisType<UserDto>) {
     let obj: any = { ...user };
-    obj.hashPassword = obj.password;
+    if (obj.password) obj.hashPassword = obj.password;
     delete obj.password;
     return obj as PartialUser;
   }

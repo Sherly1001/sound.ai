@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
-import { Exclude, instanceToPlain } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -11,10 +11,6 @@ import {
 
 @Entity()
 export class User {
-  toJSON() {
-    return instanceToPlain(this);
-  }
-
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   userId: string;

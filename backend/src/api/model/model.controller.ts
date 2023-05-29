@@ -66,7 +66,7 @@ export class ModelController {
   })
   @Get('list-type')
   async listType(@Res() res: Response) {
-    const result = await this.modelService.getModelTypess();
+    const result = await this.modelService.getModelTypes();
     new BaseResult(result).toResponse(res);
   }
 

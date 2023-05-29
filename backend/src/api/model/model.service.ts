@@ -15,10 +15,10 @@ export class ModelService {
   ) {}
 
   async getModels() {
-    return await this.modelRepo.find();
+    return await this.modelRepo.find({ relations: ['type'] });
   }
 
-  async getModelTypess() {
+  async getModelTypes() {
     return await this.modelTypeRepo.find();
   }
 

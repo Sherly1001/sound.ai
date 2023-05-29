@@ -10,7 +10,7 @@ export class DeviceDto {
 
   public static toHashPassword(user: ThisType<DeviceDto>) {
     let obj: any = { ...user };
-    obj.hashPassword = obj.password;
+    if (obj.password) obj.hashPassword = obj.password;
     delete obj.password;
     return obj as PartialDevice;
   }

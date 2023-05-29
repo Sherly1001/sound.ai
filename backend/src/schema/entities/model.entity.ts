@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -23,7 +24,7 @@ export class Model {
   @Column({ unique: true })
   modelName: string;
 
-  @ApiProperty()
+  @Exclude()
   @Column()
   modelFilePath: string;
 
