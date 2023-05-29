@@ -165,7 +165,7 @@ export class RecordController {
       ],
     },
   })
-  @UseGuards(UserGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @ApiBearerAuth('adminAuth')
   @Delete('remove/:recordId')
   async delete(@Res() res: Response, @Param('recordId') recordId: string) {

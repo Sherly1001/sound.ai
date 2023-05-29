@@ -81,7 +81,7 @@ export class ModelController {
       ],
     },
   })
-  @UseGuards(UserGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @ApiBearerAuth('adminAuth')
   @Post('create-type/:typeName')
   async createType(@Res() res: Response, @Param('typeName') typeName: string) {
@@ -101,7 +101,7 @@ export class ModelController {
       ],
     },
   })
-  @UseGuards(UserGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @ApiBearerAuth('adminAuth')
   @Delete('remove-type/:typeId')
   async removeType(@Res() res: Response, @Param('typeId') typeId: string) {
@@ -162,7 +162,7 @@ export class ModelController {
       ],
     },
   })
-  @UseGuards(UserGuard, AdminGuard)
+  @UseGuards(AdminGuard)
   @ApiBearerAuth('adminAuth')
   @Delete('remove/:modelId')
   async delete(@Res() res: Response, @Param('modelId') modelId: string) {
