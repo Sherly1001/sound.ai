@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -20,13 +21,17 @@ import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 import { DeviceGuard } from 'src/auth/dev.guard';
 import { AuthDevicePayload } from 'src/dtos/auth-device-payload.dto';
-import { BaseResult } from 'src/dtos/base-result.dto';
-import { DeviceDto, DeviceUpdateDto } from 'src/dtos/device.dto';
+import { BaseResult, Pagination } from 'src/dtos/base-result.dto';
+import {
+  DeviceDto,
+  DeviceUpdateDto,
+  ListDeviceParams,
+} from 'src/dtos/device.dto';
 import { Device } from 'src/schema/entities';
 import { DeviceService } from './device.service';
 
 @ApiTags(DeviceController.name)
-@ApiExtraModels(BaseResult, Device)
+@ApiExtraModels(BaseResult, Pagination, Device)
 @Controller('device')
 export class DeviceController {
   constructor(
@@ -40,16 +45,27 @@ export class DeviceController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
-            data: { type: 'array', items: { $ref: getSchemaPath(Device) } },
+            data: {
+              allOf: [
+                { $ref: getSchemaPath(Pagination) },
+                {
+                  properties: {
+                    items: { $ref: getSchemaPath(Device) },
+                  },
+                },
+              ],
+            },
           },
         },
       ],
     },
   })
   @Get('list')
-  async list(@Res() res: Response) {
-    const result = await this.deviceService.getDevices();
-    new BaseResult(result).toResponse(res);
+  async list(@Res() res: Response, @Query() params: ListDeviceParams) {
+    const [result, total] = await this.deviceService.getDevices(params);
+    new BaseResult(
+      new Pagination(result, total, params.limit, params.page),
+    ).toResponse(res);
   }
 
   @ApiOkResponse({

@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UploadScoreDto } from 'src/dtos/score.dto';
+import {
+  ListLabelParams,
+  ListResultParams,
+  UploadScoreDto,
+} from 'src/dtos/score.dto';
 import {
   DiagnosticResult,
   Label,
@@ -8,6 +12,7 @@ import {
   Record,
   Score,
 } from 'src/schema/entities';
+import { sqlContains, sqlNumberRange } from 'src/utils';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -22,8 +27,27 @@ export class ResultService {
     @InjectRepository(Score) private readonly scoreRepo: Repository<Score>,
   ) {}
 
-  async getLabels() {
-    return await this.labelRepo.find();
+  async getLabels(params: ListLabelParams) {
+    const query = this.labelRepo.createQueryBuilder().setParameters(params);
+
+    if (params.labelName) {
+      sqlContains(query, 'Label.labelName', 'labelName');
+    }
+
+    if (params.page > 0) {
+      query.skip(params.limit * (params.page - 1));
+    }
+
+    if (params.limit) {
+      query.take(params.limit);
+    }
+
+    if (params.orderASC) {
+      const asc = params.orderASC ? params.orderASC == 'true' : true;
+      query.orderBy('Label.labelName', asc ? 'ASC' : 'DESC');
+    }
+
+    return await query.getManyAndCount();
   }
 
   async createLabel(labelName: string) {
@@ -36,15 +60,63 @@ export class ResultService {
     return await this.labelRepo.remove(label);
   }
 
-  async getResults() {
-    return await this.resultRepo.find({
-      relations: ['record', 'record.device', 'model', 'scores', 'scores.label'],
-    });
+  async getResults(params: ListResultParams) {
+    const query = this.resultRepo.createQueryBuilder().setParameters(params);
+
+    if (params.beforeAt) {
+      query.andWhere('DiagnosticResult.timestamp <= :beforeAt::timestamptz');
+    }
+
+    if (params.afterAt) {
+      query.andWhere('DiagnosticResult.timestamp >= :afterAt::timestamptz');
+    }
+
+    if (params.deviceName) {
+      sqlContains(query, 'Device.deviceName', 'deviceName');
+    }
+
+    if (params.modelName) {
+      sqlContains(query, 'Model.modelName', 'modelName');
+    }
+
+    if (params.modelType) {
+      sqlContains(query, 'ModelType.typeName', 'modelType');
+    }
+
+    if (params.labelName) {
+      sqlContains(query, 'Label.labelName', 'labelName');
+    }
+
+    if (params.score) {
+      sqlNumberRange(query, 'Score.score', 'score');
+    }
+
+    if (params.page > 0) {
+      query.skip(params.limit * (params.page - 1));
+    }
+
+    if (params.limit) {
+      query.take(params.limit);
+    }
+
+    if (params.orderBy) {
+      const asc = params.orderASC ? params.orderASC == 'true' : true;
+      query.orderBy(params.orderBy, asc ? 'ASC' : 'DESC');
+    }
+
+    query.leftJoinAndSelect('DiagnosticResult.record', 'Record');
+    query.leftJoinAndSelect('DiagnosticResult.model', 'Model');
+    query.leftJoinAndSelect('DiagnosticResult.scores', 'Score');
+    query.leftJoinAndSelect('Record.device', 'Device');
+    query.leftJoinAndSelect('Model.type', 'ModelType');
+    query.leftJoinAndSelect('Score.label', 'Label');
+
+    return await query.getManyAndCount();
   }
 
   async diagnostic(recordId: string, modelId: string) {
     // TODO: get results from AI module
-    const lables = await this.getLabels();
+    const [lables, _] = await this.getLabels({} as any);
     const scores: UploadScoreDto[] = lables.map((l) => ({
       labelId: l.labelId,
       score: Math.random(),

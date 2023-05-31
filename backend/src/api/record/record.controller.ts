@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
   Res,
   UploadedFiles,
@@ -24,10 +25,9 @@ import {
 import { Response } from 'express';
 import { AdminGuard } from 'src/auth/admin.guard';
 import { DeviceGuard } from 'src/auth/dev.guard';
-import { UserGuard } from 'src/auth/user.guard';
 import { AuthDevicePayload } from 'src/dtos/auth-device-payload.dto';
-import { BaseResult } from 'src/dtos/base-result.dto';
-import { RecordUploadDto } from 'src/dtos/record.dto';
+import { BaseResult, Pagination } from 'src/dtos/base-result.dto';
+import { ListRecordParams, RecordUploadDto } from 'src/dtos/record.dto';
 import { Record } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
 import { RecordService } from './record.service';
@@ -47,16 +47,27 @@ export class RecordController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
-            data: { type: 'array', items: { $ref: getSchemaPath(Record) } },
+            data: {
+              allOf: [
+                { $ref: getSchemaPath(Pagination) },
+                {
+                  properties: {
+                    items: { $ref: getSchemaPath(Record) },
+                  },
+                },
+              ],
+            },
           },
         },
       ],
     },
   })
   @Get('list')
-  async list(@Res() res: Response) {
-    const result = await this.recordService.getRecords();
-    new BaseResult(result).toResponse(res);
+  async list(@Res() res: Response, @Query() params: ListRecordParams) {
+    const [result, total] = await this.recordService.getRecords(params);
+    new BaseResult(
+      new Pagination(result, total, params.limit, params.page),
+    ).toResponse(res);
   }
 
   @ApiOkResponse({

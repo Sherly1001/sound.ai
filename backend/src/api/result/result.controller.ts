@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -21,8 +22,12 @@ import { Response } from 'express';
 import { AdminGuard } from 'src/auth/admin.guard';
 import { DeviceGuard } from 'src/auth/dev.guard';
 import { UserGuard } from 'src/auth/user.guard';
-import { BaseResult } from 'src/dtos/base-result.dto';
-import { UploadScoreDto } from 'src/dtos/score.dto';
+import { BaseResult, Pagination } from 'src/dtos/base-result.dto';
+import {
+  ListLabelParams,
+  ListResultParams,
+  UploadScoreDto,
+} from 'src/dtos/score.dto';
 import { DiagnosticResult, Label, Score } from 'src/schema/entities';
 import { ResultService } from './result.service';
 
@@ -39,8 +44,14 @@ export class ResultController {
         {
           properties: {
             data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(DiagnosticResult) },
+              allOf: [
+                { $ref: getSchemaPath(Pagination) },
+                {
+                  properties: {
+                    items: { $ref: getSchemaPath(DiagnosticResult) },
+                  },
+                },
+              ],
             },
           },
         },
@@ -48,9 +59,11 @@ export class ResultController {
     },
   })
   @Get('list')
-  async list(@Res() res: Response) {
-    const result = await this.resultService.getResults();
-    new BaseResult(result).toResponse(res);
+  async list(@Res() res: Response, @Query() params: ListResultParams) {
+    const [result, total] = await this.resultService.getResults(params);
+    new BaseResult(
+      new Pagination(result, total, params.limit, params.page),
+    ).toResponse(res);
   }
 
   @ApiOkResponse({
@@ -59,16 +72,27 @@ export class ResultController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
-            data: { type: 'array', items: { $ref: getSchemaPath(Label) } },
+            data: {
+              allOf: [
+                { $ref: getSchemaPath(Pagination) },
+                {
+                  properties: {
+                    items: { $ref: getSchemaPath(Label) },
+                  },
+                },
+              ],
+            },
           },
         },
       ],
     },
   })
   @Get('list-label')
-  async listLabels(@Res() res: Response) {
-    const result = await this.resultService.getLabels();
-    new BaseResult(result).toResponse(res);
+  async listLabels(@Res() res: Response, @Query() params: ListLabelParams) {
+    const [result, total] = await this.resultService.getLabels(params);
+    new BaseResult(
+      new Pagination(result, total, params.limit, params.page),
+    ).toResponse(res);
   }
 
   @ApiOkResponse({

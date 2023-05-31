@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseGuards,
@@ -21,14 +22,17 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AdminGuard } from 'src/auth/admin.guard';
-import { UserGuard } from 'src/auth/user.guard';
-import { BaseResult } from 'src/dtos/base-result.dto';
-import { ModelUploadDto } from 'src/dtos/model.dto';
+import { BaseResult, Pagination } from 'src/dtos/base-result.dto';
+import {
+  ListModelParams,
+  ListModelTypeParams,
+  ModelUploadDto,
+} from 'src/dtos/model.dto';
 import { Model, ModelType } from 'src/schema/entities';
 import { ModelService } from './model.service';
 
 @ApiTags(ModelController.name)
-@ApiExtraModels(BaseResult, Model)
+@ApiExtraModels(BaseResult, Pagination, Model)
 @Controller('model')
 export class ModelController {
   constructor(private readonly modelService: ModelService) {}
@@ -39,16 +43,27 @@ export class ModelController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
-            data: { type: 'array', items: { $ref: getSchemaPath(Model) } },
+            data: {
+              allOf: [
+                { $ref: getSchemaPath(Pagination) },
+                {
+                  properties: {
+                    items: { $ref: getSchemaPath(Model) },
+                  },
+                },
+              ],
+            },
           },
         },
       ],
     },
   })
   @Get('list')
-  async list(@Res() res: Response) {
-    const result = await this.modelService.getModels();
-    new BaseResult(result).toResponse(res);
+  async list(@Res() res: Response, @Query() params: ListModelParams) {
+    const [result, total] = await this.modelService.getModels(params);
+    new BaseResult(
+      new Pagination(result, total, params.limit, params.page),
+    ).toResponse(res);
   }
 
   @ApiOkResponse({
@@ -57,16 +72,27 @@ export class ModelController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
-            data: { type: 'array', items: { $ref: getSchemaPath(ModelType) } },
+            data: {
+              allOf: [
+                { $ref: getSchemaPath(Pagination) },
+                {
+                  properties: {
+                    items: { $ref: getSchemaPath(ModelType) },
+                  },
+                },
+              ],
+            },
           },
         },
       ],
     },
   })
   @Get('list-type')
-  async listType(@Res() res: Response) {
-    const result = await this.modelService.getModelTypes();
-    new BaseResult(result).toResponse(res);
+  async listType(@Res() res: Response, @Query() params: ListModelTypeParams) {
+    const [result, total] = await this.modelService.getModelTypes(params);
+    new BaseResult(
+      new Pagination(result, total, params.limit, params.page),
+    ).toResponse(res);
   }
 
   @ApiOkResponse({

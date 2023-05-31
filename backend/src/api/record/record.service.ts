@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RecordUploadDto } from 'src/dtos/record.dto';
+import { ListRecordParams, RecordUploadDto } from 'src/dtos/record.dto';
 import { Device, Record } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
+import { sqlContains, sqlNumberRange } from 'src/utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -13,10 +14,45 @@ export class RecordService {
     @InjectRepository(Device) private readonly deviceRepo: Repository<Device>,
   ) {}
 
-  async getRecords() {
-    return await this.recordRepo.find({
-      relations: ['device'],
-    });
+  async getRecords(params: ListRecordParams) {
+    const query = this.recordRepo.createQueryBuilder().setParameters(params);
+
+    if (params.beforeAt) {
+      query.andWhere('Record.timestamp <= :beforeAt::timestamptz');
+    }
+
+    if (params.afterAt) {
+      query.andWhere('Record.timestamp >= :afterAt::timestamptz');
+    }
+
+    if (params.deviceName) {
+      sqlContains(query, 'Device.deviceName', 'deviceName');
+    }
+
+    if (params.temperature) {
+      sqlNumberRange(query, 'Record.temperature', 'temperature');
+    }
+
+    if (params.humidity) {
+      sqlNumberRange(query, 'Record.humidity', 'humidity');
+    }
+
+    if (params.page > 0) {
+      query.skip(params.limit * (params.page - 1));
+    }
+
+    if (params.limit) {
+      query.take(params.limit);
+    }
+
+    if (params.orderBy) {
+      const asc = params.orderASC ? params.orderASC == 'true' : true;
+      query.orderBy('Record.' + params.orderBy, asc ? 'ASC' : 'DESC');
+    }
+
+    query.leftJoinAndSelect('Record.device', 'Device');
+
+    return await query.getManyAndCount();
   }
 
   async uploadRecord(

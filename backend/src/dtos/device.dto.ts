@@ -1,5 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Device } from 'src/schema/entities/device.entity';
+import { QueryParamsDto } from './query-params.dto';
 
 export class DeviceDto {
   @ApiProperty()
@@ -21,3 +22,11 @@ export class DeviceUpdateDto extends PartialType(DeviceDto) {
   currentModel: string;
 }
 export class PartialDevice extends PartialType(Device) {}
+
+export class ListDeviceParams extends QueryParamsDto {
+  @ApiProperty({ required: false })
+  deviceName: string;
+
+  @ApiProperty({ required: false })
+  currentModel: string;
+}

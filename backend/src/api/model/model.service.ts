@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ListModelParams, ListModelTypeParams } from 'src/dtos/model.dto';
 import { Model, ModelType } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
+import { sqlContains } from 'src/utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -13,12 +15,64 @@ export class ModelService {
     private readonly modelTypeRepo: Repository<ModelType>,
   ) {}
 
-  async getModels() {
-    return await this.modelRepo.find({ relations: ['type'] });
+  async getModels(params: ListModelParams) {
+    const query = this.modelRepo.createQueryBuilder().setParameters(params);
+
+    if (params.beforeAt) {
+      query.andWhere('Model.timestamp <= :beforeAt::timestamptz');
+    }
+
+    if (params.afterAt) {
+      query.andWhere('Model.timestamp >= :afterAt::timestamptz');
+    }
+
+    if (params.modelName) {
+      sqlContains(query, 'Model.modelName', 'modelName');
+    }
+
+    if (params.modelType) {
+      sqlContains(query, 'ModelType.typeName', 'modelType');
+    }
+
+    if (params.page > 0) {
+      query.skip(params.limit * (params.page - 1));
+    }
+
+    if (params.limit) {
+      query.take(params.limit);
+    }
+
+    if (params.orderBy) {
+      const asc = params.orderASC ? params.orderASC == 'true' : true;
+      query.orderBy('Model.' + params.orderBy, asc ? 'ASC' : 'DESC');
+    }
+
+    query.leftJoinAndSelect('Model.type', 'ModelType');
+
+    return await query.getManyAndCount();
   }
 
-  async getModelTypes() {
-    return await this.modelTypeRepo.find();
+  async getModelTypes(params: ListModelTypeParams) {
+    const query = this.modelTypeRepo.createQueryBuilder().setParameters(params);
+
+    if (params.modelType) {
+      sqlContains(query, 'ModelType.typeName', 'modelType');
+    }
+
+    if (params.page > 0) {
+      query.skip(params.limit * (params.page - 1));
+    }
+
+    if (params.limit) {
+      query.take(params.limit);
+    }
+
+    if (params.orderBy) {
+      const asc = params.orderASC ? params.orderASC == 'true' : true;
+      query.orderBy('ModelType.' + params.orderBy, asc ? 'ASC' : 'DESC');
+    }
+
+    return await query.getManyAndCount();
   }
 
   async createModelType(typeName: string) {

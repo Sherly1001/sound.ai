@@ -39,3 +39,34 @@ export class BaseResult<T> {
     return instanceToPlain(obj);
   }
 }
+
+export class Pagination<T> {
+  @ApiProperty()
+  items: T[];
+
+  @ApiProperty()
+  count: number;
+
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  hasNext: boolean;
+
+  @ApiProperty()
+  hasPrev: boolean;
+
+  constructor(items: T[], total: number, limit: number, page: number) {
+    let totalPages = Math.floor(total / limit);
+
+    this.items = items;
+    this.count = items.length;
+    this.total = total;
+    this.page = page > 0 ? +page : 1;
+    this.hasNext = page < totalPages;
+    this.hasPrev = page > 1;
+  }
+}
