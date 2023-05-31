@@ -20,7 +20,7 @@ export class Record {
   device: Device;
 
   @ApiProperty()
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 
   @ApiProperty()

@@ -33,6 +33,6 @@ export class DiagnosticResult {
   scores: Score[];
 
   @ApiProperty()
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 }

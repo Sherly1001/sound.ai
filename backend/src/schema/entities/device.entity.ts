@@ -27,6 +27,10 @@ export class Device {
   @Column({ unique: true })
   deviceName: string;
 
+  @ApiProperty()
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  timestamp: Date;
+
   @Exclude()
   @Column()
   hashPassword: string;

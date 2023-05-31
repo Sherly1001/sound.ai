@@ -29,6 +29,6 @@ export class Model {
   modelFilePath: string;
 
   @ApiProperty()
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 }
