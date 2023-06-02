@@ -10,6 +10,7 @@ import {
   Model,
   Record,
   Score,
+  User,
 } from 'src/schema/entities';
 import { ResultController } from './result.controller';
 import { ResultService } from './result.service';
@@ -20,6 +21,7 @@ import { ResultService } from './result.service';
     TypeOrmModule.forFeature([
       DiagnosticResult,
       Device,
+      User,
       Model,
       Record,
       Score,

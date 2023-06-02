@@ -24,6 +24,12 @@ export class ListResultParams extends QueryParamsDto {
 
   @ApiProperty({ required: false })
   labelName: string;
+
+  @ApiProperty({ required: false })
+  diagnosticByUser: string;
+
+  @ApiProperty({ required: false })
+  diagnosticByDevice: string;
 }
 
 export class ListLabelParams extends PickType(QueryParamsDto, [

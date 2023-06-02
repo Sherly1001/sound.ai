@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -18,10 +19,12 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AdminGuard } from 'src/auth/admin.guard';
 import { DeviceGuard } from 'src/auth/dev.guard';
 import { UserGuard } from 'src/auth/user.guard';
+import { AuthDevicePayload } from 'src/dtos/auth-device-payload.dto';
+import { AuthUserPayload } from 'src/dtos/auth-user-payload.dto';
 import { BaseResult, Pagination } from 'src/dtos/base-result.dto';
 import {
   ListLabelParams,
@@ -155,11 +158,19 @@ export class ResultController {
   @ApiBearerAuth('devAuth')
   @Post('diagnostic/:recordId/:modelId')
   async diagnostic(
+    @Req() req: Request,
     @Res() res: Response,
     @Param('recordId') recordId: string,
     @Param('modelId') modelId: string,
   ) {
-    const result = await this.resultService.diagnostic(recordId, modelId);
+    const user: AuthUserPayload = req['user'];
+    const dev: AuthDevicePayload = req['dev'];
+    const result = await this.resultService.diagnostic(
+      recordId,
+      modelId,
+      user?.userId ?? null,
+      dev?.deviceId ?? null,
+    );
     new BaseResult(result).toResponse(res);
   }
 
@@ -186,15 +197,20 @@ export class ResultController {
   @ApiBearerAuth('devAuth')
   @Post('upload-scores/:recordId/:modelId')
   async uploadScores(
+    @Req() req: Request,
     @Res() res: Response,
     @Param('recordId') recordId: string,
     @Param('modelId') modelId: string,
     @Body() scores: UploadScoreDto[],
   ) {
+    const user: AuthUserPayload = req['user'];
+    const dev: AuthDevicePayload = req['dev'];
     const result = await this.resultService.uploadScores(
       recordId,
       modelId,
       scores,
+      user?.userId ?? null,
+      dev?.deviceId ?? null,
     );
     new BaseResult(result).toResponse(res);
   }

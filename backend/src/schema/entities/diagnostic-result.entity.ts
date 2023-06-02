@@ -7,9 +7,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Device } from './device.entity';
 import { Model } from './model.entity';
 import { Record } from './record.entity';
 import { Score } from './score.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class DiagnosticResult {
@@ -26,6 +28,16 @@ export class DiagnosticResult {
   @JoinColumn()
   @ManyToOne(() => Model)
   model: Model;
+
+  @ApiProperty()
+  @JoinColumn()
+  @ManyToOne(() => User, { nullable: true })
+  diagnosticByUser: User;
+
+  @ApiProperty()
+  @JoinColumn()
+  @ManyToOne(() => Device, { nullable: true })
+  diagnosticByDevice: Device;
 
   @ApiProperty({ type: [Score] })
   @JoinColumn()

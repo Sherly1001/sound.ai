@@ -6,11 +6,13 @@ import {
   UploadScoreDto,
 } from 'src/dtos/score.dto';
 import {
+  Device,
   DiagnosticResult,
   Label,
   Model,
   Record,
   Score,
+  User,
 } from 'src/schema/entities';
 import { sqlContains, sqlNumberRange } from 'src/utils';
 import { DataSource, Repository } from 'typeorm';
@@ -21,6 +23,8 @@ export class ResultService {
     private readonly dataSource: DataSource,
     @InjectRepository(DiagnosticResult)
     private readonly resultRepo: Repository<DiagnosticResult>,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(Device) private readonly deviceRepo: Repository<Device>,
     @InjectRepository(Label) private readonly labelRepo: Repository<Label>,
     @InjectRepository(Record) private readonly recordRepo: Repository<Record>,
     @InjectRepository(Model) private readonly modelRepo: Repository<Model>,
@@ -87,6 +91,14 @@ export class ResultService {
       sqlContains(query, 'Label.labelName', 'labelName');
     }
 
+    if (params.diagnosticByUser) {
+      sqlContains(query, 'User.username', 'diagnosticByUser');
+    }
+
+    if (params.diagnosticByDevice) {
+      sqlContains(query, 'ResultDevice.deviceName', 'diagnosticByDevice');
+    }
+
     if (params.score) {
       sqlNumberRange(query, 'Score.score', 'score');
     }
@@ -107,6 +119,11 @@ export class ResultService {
     query.leftJoinAndSelect('DiagnosticResult.record', 'Record');
     query.leftJoinAndSelect('DiagnosticResult.model', 'Model');
     query.leftJoinAndSelect('DiagnosticResult.scores', 'Score');
+    query.leftJoinAndSelect('DiagnosticResult.diagnosticByUser', 'User');
+    query.leftJoinAndSelect(
+      'DiagnosticResult.diagnosticByDevice',
+      'ResultDevice',
+    );
     query.leftJoinAndSelect('Record.device', 'Device');
     query.leftJoinAndSelect('Model.type', 'ModelType');
     query.leftJoinAndSelect('Score.label', 'Label');
@@ -114,27 +131,52 @@ export class ResultService {
     return await query.getManyAndCount();
   }
 
-  async diagnostic(recordId: string, modelId: string) {
+  async diagnostic(
+    recordId: string,
+    modelId: string,
+    byUserId: string = null,
+    byDeviceId: string = null,
+  ) {
     // TODO: get results from AI module
     const [lables, _] = await this.getLabels({} as any);
     const scores: UploadScoreDto[] = lables.map((l) => ({
       labelId: l.labelId,
       score: Math.random(),
     }));
-    return await this.uploadScores(recordId, modelId, scores);
+    return await this.uploadScores(
+      recordId,
+      modelId,
+      scores,
+      byUserId,
+      byDeviceId,
+    );
   }
 
   async uploadScores(
     recordId: string,
     modelId: string,
     scores: UploadScoreDto[],
+    byUserId: string = null,
+    byDeviceId: string = null,
   ) {
     const record = await this.recordRepo.findOneBy({ recordId });
     const model = await this.modelRepo.findOneBy({ modelId });
+    const diagnosticByUser = byUserId
+      ? await this.userRepo.findOneBy({
+          userId: byUserId,
+        })
+      : null;
+    const diagnosticByDevice = byDeviceId
+      ? await this.deviceRepo.findOneBy({
+          deviceId: byDeviceId,
+        })
+      : null;
 
     const result = this.resultRepo.create({
       record,
       model,
+      diagnosticByUser,
+      diagnosticByDevice,
       scores: scores.map((score) => ({
         score: score.score,
         label: {
