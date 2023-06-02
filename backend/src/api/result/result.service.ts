@@ -75,6 +75,10 @@ export class ResultService {
       query.andWhere('DiagnosticResult.timestamp >= :afterAt::timestamptz');
     }
 
+    if (params.recordId) {
+      query.andWhere('Record.recordId = :recordId');
+    }
+
     if (params.deviceName) {
       sqlContains(query, 'Device.deviceName', 'deviceName');
     }

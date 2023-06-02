@@ -11,6 +11,9 @@ export class UploadScoreDto {
 
 export class ListResultParams extends QueryParamsDto {
   @ApiProperty({ required: false })
+  recordId: string;
+
+  @ApiProperty({ required: false })
   deviceName: string;
 
   @ApiProperty({ required: false })
