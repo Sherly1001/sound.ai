@@ -1,9 +1,14 @@
 import { Flex, Image, Text } from '@chakra-ui/react';
-import Rounded from '../comps/Rounded';
+import { useEffect } from 'react';
+import RoundedMain from '../comps/RoundedMain';
 
 export default function NotFound() {
+  useEffect(() => {
+    document.title = 'Page Not Found';
+  }, []);
+
   return (
-    <Rounded>
+    <RoundedMain>
       <Flex
         direction="column"
         alignItems="center"
@@ -17,6 +22,6 @@ export default function NotFound() {
           Access This page
         </Text>
       </Flex>
-    </Rounded>
+    </RoundedMain>
   );
 }

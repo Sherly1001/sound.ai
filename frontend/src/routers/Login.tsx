@@ -13,7 +13,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Rounded from '../comps/Rounded';
+import RoundedMain from '../comps/RoundedMain';
 
 export default function Login({ register = false }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +25,7 @@ export default function Login({ register = false }) {
   }, [register]);
 
   return (
-    <Rounded>
+    <RoundedMain>
       <Flex w="100%" h="100%">
         <Flex flex="1" justifyContent="center" display={['none', 'flex']}>
           <Image src="/login-img.svg" width="80%" />
@@ -108,6 +108,6 @@ export default function Login({ register = false }) {
           )}
         </Flex>
       </Flex>
-    </Rounded>
+    </RoundedMain>
   );
 }
