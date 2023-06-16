@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { links } from '../utils/const';
 import Dashboard from './Dashboard';
 import Devices from './Devices';
 import Login from './Login';
@@ -10,38 +11,38 @@ import Settings from './Settings';
 
 export const routers = createBrowserRouter([
   {
-    path: '/',
+    path: links.home(),
     element: <Root />,
     errorElement: <NotFound />,
     children: [
       {
-        path: '/',
+        path: links.home(),
         element: <Dashboard />,
       },
       {
-        path: '/records',
+        path: links.home.records(),
         element: <Records />,
       },
       {
-        path: '/models',
+        path: links.home.models(),
         element: <Models />,
       },
       {
-        path: '/devices',
+        path: links.home.devices(),
         element: <Devices />,
       },
       {
-        path: '/settings',
+        path: links.home.settings(),
         element: <Settings />,
       },
     ],
   },
   {
-    path: '/login',
+    path: links.login(),
     element: <Login />,
   },
   {
-    path: '/register',
+    path: links.register(),
     element: <Login register={true} />,
   },
 ]);

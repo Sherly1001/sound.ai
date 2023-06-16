@@ -1,42 +1,42 @@
-import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import {
   faFloppyDisk,
   faGear,
   faList,
   faRightFromBracket,
 } from '@fortawesome/free-solid-svg-icons';
+import { facDashboard, facDeepLearning, facRighRect } from '../custom-icons';
+
+import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useLocation } from 'react-router-dom';
-import { facDashboard } from '../custom-icons/dashboard';
-import { facDeepLearning } from '../custom-icons/deep-learing';
-import { facRighRect } from '../custom-icons/right-rect';
+import { links } from '../utils/const';
 
 export default function Navbar() {
   const location = useLocation();
 
-  const links = [
+  const navLinks = [
     {
-      to: '/',
+      to: links.home(),
       icon: facDashboard,
       name: 'Dashboard',
     },
     {
-      to: '/records',
+      to: links.home.records(),
       icon: faList,
       name: 'Records',
     },
     {
-      to: '/models',
+      to: links.home.models(),
       icon: facDeepLearning,
       name: 'Models',
     },
     {
-      to: '/devices',
+      to: links.home.devices(),
       icon: faFloppyDisk,
       name: 'Devices',
     },
     {
-      to: '/settings',
+      to: links.home.settings(),
       icon: faGear,
       name: 'Settings',
     },
@@ -54,11 +54,11 @@ export default function Navbar() {
       direction="column"
       userSelect="none"
     >
-      <Link to="/">
+      <Link to={links.home()}>
         <Image src="/logo.png" width="50%" margin="0 auto" />
       </Link>
-      <Link to="/">
-        <Text fontSize="4xl" textAlign="center" color="magenta">
+      <Link to={links.home()}>
+        <Text fontSize="4xl" textAlign="center" color="pink.600">
           Sound.AI
         </Text>
       </Link>
@@ -69,15 +69,15 @@ export default function Navbar() {
         borderBottom="2px solid #EBEBEB"
         marginBottom="1em"
       />
-      {links.map((li, id) => (
+      {navLinks.map((li, id) => (
         <Link to={li.to} key={id}>
           <Text
-            color={li.to == location.pathname ? 'red' : 'link'}
+            color={li.to == location.pathname ? 'red.600' : 'messenger.900'}
             fontSize="xl"
             marginBottom=".5em"
             position="relative"
             _hover={{
-              color: li.to != location.pathname ? 'linkLight' : '',
+              color: li.to != location.pathname ? 'messenger.400' : '',
             }}
           >
             <FontAwesomeIcon icon={li.icon} /> {li.name}
@@ -99,9 +99,9 @@ export default function Navbar() {
       <Button
         leftIcon={<FontAwesomeIcon icon={faRightFromBracket} />}
         marginTop="auto"
-        color="link"
+        color="messenger.900"
         _hover={{
-          color: 'linkLight',
+          color: 'messenger.400',
         }}
       >
         Logout

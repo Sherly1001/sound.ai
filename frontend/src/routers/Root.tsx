@@ -38,7 +38,11 @@ export default function Root() {
       <Navbar />
       <Box flex="1">
         <Header ref={headerRef} headerOver={headerOver} />
-        <Box ref={mainRef}>
+        <Box
+          ref={mainRef}
+          width={['100%', null, null, null, '95%', '90%']}
+          margin="auto"
+        >
           <Outlet />
         </Box>
       </Box>

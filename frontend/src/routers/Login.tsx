@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import RoundedMain from '../comps/RoundedMain';
+import { links } from '../utils/const';
 
 export default function Login({ register = false }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -48,11 +49,11 @@ export default function Login({ register = false }) {
             <Input
               type="text"
               placeholder="Enter your username"
-              background="holder"
+              background="background"
               border="none"
               required
               _placeholder={{
-                color: 'holderText',
+                color: 'gray.400',
               }}
             />
           </FormControl>
@@ -62,11 +63,11 @@ export default function Login({ register = false }) {
               <Input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
-                background="holder"
+                background="background"
                 border="none"
                 required
                 _placeholder={{
-                  color: 'holderText',
+                  color: 'gray.400',
                 }}
               />
               <InputRightElement
@@ -79,29 +80,29 @@ export default function Login({ register = false }) {
             </InputGroup>
           </FormControl>
           <Button
-            background="blue"
+            background="facebook.400"
             color="white"
             type="submit"
             marginBottom="1em"
             _hover={{
-              background: 'darkBlue',
+              background: 'facebook.500',
             }}
           >
             {register ? 'Register' : 'Login'}
           </Button>
           {register ? (
-            <Text textAlign="right" as="i" color="gray">
+            <Text textAlign="right" as="i" color="gray.500">
               or{' '}
-              <Text color="blue" as="span">
-                <Link to="/login">Login</Link>
+              <Text color="cyan.700" as="span">
+                <Link to={links.login()}>Login</Link>
               </Text>
               .
             </Text>
           ) : (
-            <Text textAlign="right" as="i" color="gray">
+            <Text textAlign="right" as="i" color="gray.500">
               or{' '}
-              <Text color="blue" as="span">
-                <Link to="/register">Register</Link>
+              <Text color="cyan.700" as="span">
+                <Link to={links.register()}>Register</Link>
               </Text>{' '}
               new account.
             </Text>

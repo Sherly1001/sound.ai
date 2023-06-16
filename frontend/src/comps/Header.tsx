@@ -32,7 +32,7 @@ function Header(
           <Text fontSize="2xl" fontWeight="bold" color="black">
             Hello, {username}
           </Text>
-          <Text color="red">{new Date().toDateString()}</Text>
+          <Text color="red.600">{new Date().toDateString()}</Text>
         </Flex>
       </Box>
       <Box>

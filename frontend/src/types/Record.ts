@@ -1,4 +1,5 @@
 import { Device } from '.';
+import { Result } from './Result';
 
 export interface Record {
   recordId: string;
@@ -10,4 +11,5 @@ export interface Record {
   audioFft: string;
   imageFilePath: string;
   location: string;
+  results?: Result[];
 }
