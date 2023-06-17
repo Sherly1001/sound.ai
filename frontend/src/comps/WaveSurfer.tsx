@@ -1,4 +1,11 @@
-import { Box, Flex, Text } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Flex,
+  Text,
+} from '@chakra-ui/react';
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { RefObject, useEffect, useRef, useState } from 'react';
@@ -65,27 +72,40 @@ export default function ReactWaveSurfer({ options }: Props) {
   }, [playing, wavesurfer]);
 
   return (
-    <Box>
-      <Flex userSelect="none" alignItems="center">
-        <Text marginEnd="2">Sound track: </Text>
-        <FontAwesomeIcon
-          icon={playing ? faStop : faPlay}
-          onClick={() => setPlaying(!playing)}
-          cursor="pointer"
-        />
-      </Flex>
+    <Box position="relative">
       <Box
-        ref={ref}
-        onWheel={(e) => {
-          ref.current
-            ?.querySelector('div')
-            ?.shadowRoot?.querySelector('div')
-            ?.scrollBy({ left: e.deltaY, behavior: 'smooth' });
-        }}
-        onContextMenu={(e) => {
-          e.preventDefault();
-        }}
-      />
+        position="absolute"
+        width="100%"
+        height="100%"
+        display={options.url ? 'none' : 'block'}
+      >
+        <Alert status="warning">
+          <AlertIcon />
+          <AlertDescription>No Data</AlertDescription>
+        </Alert>
+      </Box>
+      <Box visibility={options.url ? 'visible' : 'hidden'}>
+        <Flex userSelect="none" alignItems="center">
+          <Text marginEnd="2">Sound track: </Text>
+          <FontAwesomeIcon
+            icon={playing ? faStop : faPlay}
+            onClick={() => setPlaying(!playing)}
+            cursor="pointer"
+          />
+        </Flex>
+        <Box
+          ref={ref}
+          onWheel={(e) => {
+            ref.current
+              ?.querySelector('div')
+              ?.shadowRoot?.querySelector('div')
+              ?.scrollBy({ left: e.deltaY, behavior: 'smooth' });
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}
+        />
+      </Box>
     </Box>
   );
 }

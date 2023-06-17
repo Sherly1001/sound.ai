@@ -1,7 +1,7 @@
 import { Box, Image } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 
-interface Props {
+export interface Props {
   src: string;
   width?: string;
   height?: string;

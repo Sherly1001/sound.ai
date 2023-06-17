@@ -6,31 +6,18 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { facDeepLearning } from '../custom-icons';
 
-import {
-  Box,
-  Flex,
-  Grid,
-  HStack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  Tooltip,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Grid, HStack, Text, VStack } from '@chakra-ui/react';
 import { Icon, Marker as LMarker } from 'leaflet';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 import Map from '../comps/Map';
 import Rounded from '../comps/Rounded';
-import { getBounds, locationToLatLng, truncate } from '../utils/funcs';
+import { getBounds, locationToLatLng } from '../utils/funcs';
 
 import ImgZoom from '../comps/ImgZoom';
-import ResultList from '../comps/ResultList';
-import ReactWaveSurfer from '../comps/WaveSurfer';
+import Loading from '../comps/Loading';
+import RecordInfo from '../comps/RecordInfo';
 import { Record } from '../types';
 import { RED_MARKER, links } from '../utils/const';
 
@@ -61,7 +48,7 @@ const stas = [
   },
 ];
 
-const datapoints = [
+const globalDatapoints = [
   {
     recordId: 'e8ae9eda-8707-4e35-812b-cebf17b47bcb',
     location: '35.68401735486973,139.7668688074273',
@@ -170,174 +157,103 @@ const datapoints = [
 
 export default function Dashboard() {
   const [currentData, setCurrentData] = useState(0);
+  const [datapoints, setDatapoints] = useState<Record[]>([]);
 
   useEffect(() => {
     document.title = 'Dashboard';
   }, []);
 
+  const getData = useCallback(() => {
+    return new Promise<Record[]>((res, _rej) => {
+      setTimeout(() => {
+        res(globalDatapoints);
+      }, 200);
+    });
+  }, []);
+
   return (
-    <Box padding="5">
-      <Grid
-        templateColumns="repeat(12, 1fr)"
-        gap={{ base: '5', xl: '6', '2xl': '8' }}
-      >
-        {stas.map((st, idx) => (
-          <Rounded key={idx} flex="1" padding="5" gridColumn="span 3">
-            <Link to={st.link}>
-              <HStack>
-                <Box background="background" padding="3" borderRadius="5">
-                  <FontAwesomeIcon icon={st.icon} fontSize="24" />
-                </Box>
-                <VStack alignItems="start" spacing="0">
-                  <Text color="cyan.700">{st.name}</Text>
-                  <Text color="black" fontSize="xl" fontWeight="bold">
-                    {st.value}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Link>
-          </Rounded>
-        ))}
-        <Rounded
-          height="65vh"
-          padding="2"
-          gridColumn={{ base: '1/9', xl: '1/10' }}
+    <Loading getData={getData} setData={setDatapoints}>
+      <Box padding="5">
+        <Grid
+          templateColumns="repeat(12, 1fr)"
+          gap={{ base: '5', xl: '6', '2xl': '8' }}
         >
-          <Map
-            bounds={getBounds(
-              datapoints.map((dt) => locationToLatLng(dt.location)),
-            )}
-          >
-            {datapoints.map((dt, idx) => (
-              <Marker
-                key={idx}
-                position={locationToLatLng(dt.location)}
-                icon={idx == currentData ? RED_MARKER : new Icon.Default()}
-                eventHandlers={{
-                  popupopen(_e) {
-                    setCurrentData(idx);
-                  },
-                  add(e) {
-                    if (idx == 0) {
-                      const marker = e.target as LMarker;
-                      const pop = marker.getPopup();
-                      if (!pop?.isOpen()) {
-                        pop?.toggle();
-                      }
-                    }
-                  },
-                }}
-              >
-                <Popup>
-                  <Box>
-                    <ImgZoom
-                      src={dt.imageFilePath}
-                      width="52"
-                      zoomScale={4}
-                      transitionTime={0.3}
-                    />
-                    <Text as="div" marginY="2">
-                      Temperature: {dt.temperature ?? 0} °C
-                    </Text>
-                    <Text as="div" marginY="2">
-                      Humidity: {dt.humidity ?? 0} %
-                    </Text>
+          {stas.map((st, idx) => (
+            <Rounded key={idx} flex="1" padding="5" gridColumn="span 3">
+              <Link to={st.link}>
+                <HStack>
+                  <Box background="background" padding="3" borderRadius="5">
+                    <FontAwesomeIcon icon={st.icon} fontSize="24" />
                   </Box>
-                </Popup>
-              </Marker>
-            ))}
-          </Map>
-        </Rounded>
-        <Rounded
-          height="65vh"
-          padding="2"
-          gridColumn={{ base: 'span 4', xl: 'span 3' }}
-        >
-          <Flex flexDirection="column" height="100%">
-            <Text textAlign="center" fontWeight="bold">
-              <Link to={links.home.records(datapoints[currentData]?.recordId)}>
-                Record:{' '}
-                <Tooltip
-                  hasArrow
-                  placement="top"
-                  label={datapoints[currentData]?.recordId}
-                >
-                  {truncate(datapoints[currentData]?.recordId, 15)}
-                </Tooltip>
+                  <VStack alignItems="start" spacing="0">
+                    <Text color="cyan.700">{st.name}</Text>
+                    <Text color="black" fontSize="xl" fontWeight="bold">
+                      {st.value}
+                    </Text>
+                  </VStack>
+                </HStack>
               </Link>
-            </Text>
-            <Box paddingTop="4">
-              <ReactWaveSurfer
-                options={{
-                  url: datapoints[currentData]?.audioFilePath,
-                  normalize: true,
-                  progressColor: '#EC407A',
-                  waveColor: '#D1D6DA',
-                  minPxPerSec: 500,
-                  hideScrollbar: true,
-                }}
-              />
-            </Box>
-            <Tabs
-              colorScheme="green"
-              height={0}
-              flex="1"
-              display="flex"
-              flexDirection="column"
+            </Rounded>
+          ))}
+          <Rounded
+            height="65vh"
+            padding="2"
+            gridColumn={{ base: '1/9', xl: '1/10' }}
+          >
+            <Map
+              bounds={getBounds(
+                datapoints.map((dt) => locationToLatLng(dt.location)),
+              )}
             >
-              <TabList>
-                <Tab>Record Info</Tab>
-                <Tab>Diagnostic Results</Tab>
-              </TabList>
-              <TabPanels
-                height={0}
-                flex="1"
-                overflowY="auto"
-                display="flex"
-                flexDirection="column"
-              >
-                <TabPanel>
-                  <Text marginBottom="2">
-                    Uploaded by:{' '}
-                    <Link
-                      to={links.home.devices(
-                        datapoints[currentData]?.device?.deviceId,
-                      )}
-                    >
-                      <Text color="messenger.400" as="span">
-                        {datapoints[currentData]?.device?.deviceName}
+              {datapoints.map((dt, idx) => (
+                <Marker
+                  key={idx}
+                  position={locationToLatLng(dt.location)}
+                  icon={idx == currentData ? RED_MARKER : new Icon.Default()}
+                  eventHandlers={{
+                    popupopen(_e) {
+                      setCurrentData(idx);
+                    },
+                    add(e) {
+                      if (idx == 0) {
+                        const marker = e.target as LMarker;
+                        const pop = marker.getPopup();
+                        if (!pop?.isOpen()) {
+                          pop?.toggle();
+                        }
+                      }
+                    },
+                  }}
+                >
+                  <Popup>
+                    <Box>
+                      <ImgZoom
+                        src={dt.imageFilePath}
+                        width="52"
+                        zoomScale={4}
+                        transitionTime={0.3}
+                      />
+                      <Text as="div" marginY="2">
+                        Temperature: {dt.temperature ?? 0} °C
                       </Text>
-                    </Link>
-                  </Text>
-                  <Text marginBottom="2">
-                    Uploaded at:{' '}
-                    <Tooltip
-                      hasArrow
-                      placement="top"
-                      label={(
-                        datapoints[currentData]?.timestamp ?? new Date()
-                      ).toLocaleString()}
-                    >
-                      {(
-                        datapoints[currentData]?.timestamp ?? new Date()
-                      ).toLocaleDateString()}
-                    </Tooltip>
-                  </Text>
-                  <Text marginBottom="2">
-                    Temperature: {datapoints[currentData]?.temperature ?? 0} °C
-                  </Text>
-                  <Text marginBottom="2">
-                    Humidity: {datapoints[currentData]?.humidity ?? 0} %
-                  </Text>
-                </TabPanel>
-                <TabPanel paddingX={0} paddingBottom={0} height="100%">
-                  <ResultList record={datapoints[currentData]} />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </Flex>
-        </Rounded>
-      </Grid>
-    </Box>
+                      <Text as="div" marginY="2">
+                        Humidity: {dt.humidity ?? 0} %
+                      </Text>
+                    </Box>
+                  </Popup>
+                </Marker>
+              ))}
+            </Map>
+          </Rounded>
+          <Rounded
+            height="65vh"
+            padding="2"
+            gridColumn={{ base: 'span 4', xl: 'span 3' }}
+          >
+            <RecordInfo record={datapoints[currentData]} />
+          </Rounded>
+        </Grid>
+      </Box>
+    </Loading>
   );
 }
