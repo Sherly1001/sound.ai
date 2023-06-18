@@ -1,5 +1,5 @@
 import { LatLngBounds, LatLngExpression } from 'leaflet';
-import { ReactNode, useCallback } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet';
 
 import { BOUNDS_PAD, MAP_ATTRIBUTION, MAP_TILE_URL } from '../utils/const';
@@ -19,6 +19,8 @@ export interface MapProps {
 }
 
 export default function Map({ children, zoom = 12, bounds }: MapProps) {
+  const [firstLoad, setFirstLoad] = useState(true);
+
   const MapEvents = useCallback(() => {
     const map = useMapEvents({
       contextmenu(e) {
@@ -27,6 +29,13 @@ export default function Map({ children, zoom = 12, bounds }: MapProps) {
         }
       },
     });
+
+    useEffect(() => {
+      if (firstLoad && map && bounds) {
+        map.flyToBounds(bounds.pad(BOUNDS_PAD));
+        setFirstLoad(false);
+      }
+    }, [firstLoad]);
 
     return <></>;
   }, [bounds]);
