@@ -15,9 +15,9 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from '../comps/Link';
+import { routes } from '../routers';
 import { Record } from '../types';
-import { links } from '../utils/const';
 import { truncate } from '../utils/funcs';
 
 export interface Props {
@@ -49,7 +49,10 @@ export default function ResultList({ record }: Props) {
           <Box paddingX="4" fontSize="sm" textAlign="center" color="gray.600">
             <Text>
               Diagnostic with model:{' '}
-              <Link to={links.home.models(result?.model?.modelId)}>
+              <Link
+                to={routes.home.models}
+                params={{ id: result?.model?.modelId }}
+              >
                 <Text as="span" color="messenger.400">
                   {result?.model?.modelName}
                 </Text>
@@ -93,7 +96,7 @@ export default function ResultList({ record }: Props) {
         <AlertIcon />
         <AlertDescription>
           Not diagnostic yet,{' '}
-          <Link to={links.home.records(record?.recordId)}>
+          <Link to={routes.home.records} params={{ id: record?.recordId }}>
             <Text as="span" color="messenger.400">
               diagnostic
             </Text>

@@ -19,33 +19,3 @@ export const MAP_TILE_URL =
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 export const MAP_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
-const home = function () {
-  return '/';
-};
-
-home.records = function (id?: string) {
-  return this() + 'records' + (id ? '/' + id : '');
-};
-
-home.models = function (id?: string) {
-  return this() + 'models' + (id ? '/' + id : '');
-};
-
-home.devices = function (id?: string) {
-  return this() + 'devices' + (id ? '/' + id : '');
-};
-
-home.settings = function () {
-  return this() + 'settings';
-};
-
-export const links = {
-  home,
-  login() {
-    return '/login';
-  },
-  register() {
-    return '/register';
-  },
-};

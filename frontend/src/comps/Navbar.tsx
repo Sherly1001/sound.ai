@@ -8,35 +8,37 @@ import { facDashboard, facDeepLearning, facRighRect } from '../custom-icons';
 
 import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, useLocation } from 'react-router-dom';
-import { links } from '../utils/const';
+import { useLocation } from 'react-router-dom';
+import { routes } from '../routers';
+import { build } from '../routers/route';
+import Link from './Link';
 
 export default function Navbar() {
   const location = useLocation();
 
   const navLinks = [
     {
-      to: links.home(),
+      to: routes.home,
       icon: facDashboard,
       name: 'Dashboard',
     },
     {
-      to: links.home.records(),
+      to: routes.home.records,
       icon: faList,
       name: 'Records',
     },
     {
-      to: links.home.models(),
+      to: routes.home.models,
       icon: facDeepLearning,
       name: 'Models',
     },
     {
-      to: links.home.devices(),
+      to: routes.home.devices,
       icon: faFloppyDisk,
       name: 'Devices',
     },
     {
-      to: links.home.settings(),
+      to: routes.home.settings,
       icon: faGear,
       name: 'Settings',
     },
@@ -54,10 +56,10 @@ export default function Navbar() {
       direction="column"
       userSelect="none"
     >
-      <Link to={links.home()}>
+      <Link to={routes.home}>
         <Image src="/logo.png" width="50%" margin="0 auto" />
       </Link>
-      <Link to={links.home()}>
+      <Link to={routes.home}>
         <Text fontSize="4xl" textAlign="center" color="pink.600">
           Sound.AI
         </Text>
@@ -72,16 +74,18 @@ export default function Navbar() {
       {navLinks.map((li, id) => (
         <Link to={li.to} key={id}>
           <Text
-            color={li.to == location.pathname ? 'red.600' : 'messenger.900'}
+            color={
+              build(li.to) == location.pathname ? 'red.600' : 'messenger.900'
+            }
             fontSize="xl"
             marginBottom=".5em"
             position="relative"
             _hover={{
-              color: li.to != location.pathname ? 'messenger.400' : '',
+              color: build(li.to) != location.pathname ? 'messenger.400' : '',
             }}
           >
             <FontAwesomeIcon icon={li.icon} /> {li.name}
-            {li.to == location.pathname && (
+            {build(li.to) == location.pathname && (
               <Text
                 as="span"
                 position="absolute"

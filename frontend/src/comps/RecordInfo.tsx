@@ -12,9 +12,9 @@ import {
   Text,
   Tooltip,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import Link from '../comps/Link';
+import { routes } from '../routers';
 import { Record } from '../types';
-import { links } from '../utils/const';
 import { truncate } from '../utils/funcs';
 import ResultList from './ResultList';
 import ReactWaveSurfer from './WaveSurfer';
@@ -29,7 +29,7 @@ export default function RecordInfo({ record }: Props) {
       <Text textAlign="center" fontWeight="bold">
         Record:{' '}
         {record && (
-          <Link to={links.home.records(record?.recordId)}>
+          <Link to={routes.home.records} params={{ id: record.recordId }}>
             <Tooltip hasArrow placement="top" label={record?.recordId}>
               {truncate(record?.recordId ?? '', 15)}
             </Tooltip>
@@ -71,7 +71,10 @@ export default function RecordInfo({ record }: Props) {
               <>
                 <Text marginBottom="2">
                   Uploaded by:{' '}
-                  <Link to={links.home.devices(record?.device?.deviceId)}>
+                  <Link
+                    to={routes.home.devices}
+                    params={{ id: record.device?.deviceId }}
+                  >
                     <Text color="messenger.400" as="span">
                       {record?.device?.deviceName}
                     </Text>

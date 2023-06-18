@@ -12,9 +12,9 @@ import {
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { routes } from '.';
+import Link from '../comps/Link';
 import RoundedMain from '../comps/RoundedMain';
-import { links } from '../utils/const';
 
 export default function Login({ register = false }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -94,7 +94,7 @@ export default function Login({ register = false }) {
             <Text textAlign="right" as="i" color="gray.500">
               or{' '}
               <Text color="cyan.700" as="span">
-                <Link to={links.login()}>Login</Link>
+                <Link to={routes.login}>Login</Link>
               </Text>
               .
             </Text>
@@ -102,7 +102,7 @@ export default function Login({ register = false }) {
             <Text textAlign="right" as="i" color="gray.500">
               or{' '}
               <Text color="cyan.700" as="span">
-                <Link to={links.register()}>Register</Link>
+                <Link to={routes.register}>Register</Link>
               </Text>{' '}
               new account.
             </Text>
