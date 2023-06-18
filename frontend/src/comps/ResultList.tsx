@@ -81,7 +81,7 @@ export default function ResultList({ record }: Props) {
                 {result?.scores?.map((sc, idx) => (
                   <Tr key={idx}>
                     <Td>{sc?.label?.labelName}</Td>
-                    <Td>{sc?.score}</Td>
+                    <Td>{sc?.score?.toFixed(4)}</Td>
                   </Tr>
                 ))}
               </Tbody>

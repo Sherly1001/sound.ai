@@ -26,6 +26,7 @@ function Header(
       boxShadow={headerOver ? '0px 0px 4px -2px #00000040' : undefined}
       transition="all 0.3s"
       alignItems="center"
+      zIndex="overlay"
     >
       <Box flex="1" ref={ref}>
         <Flex direction="column">

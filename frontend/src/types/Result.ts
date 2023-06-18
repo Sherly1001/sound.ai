@@ -4,8 +4,8 @@ export interface Result {
   resultId: string;
   record: Record;
   model: Model;
-  diagnosticByUser: User;
-  diagnosticByDevice: Device;
+  diagnosticByUser?: User;
+  diagnosticByDevice?: Device;
   scores: Score[];
   timestamp: Date;
 }

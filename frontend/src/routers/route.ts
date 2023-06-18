@@ -4,6 +4,7 @@ import {
   createBrowserRouter,
   createHashRouter,
   generatePath,
+  useLocation,
 } from 'react-router-dom';
 
 export interface Route<T = {}> {
@@ -28,8 +29,23 @@ export function from<A = {}, B = {}>(base: Route<A>, child: Route<B>) {
   return res;
 }
 
-export function build<T>(route: Route<T>, params?: T) {
-  return generatePath(route.path, params as any);
+export function build<T>(
+  route: Route<T>,
+  params?: T,
+  queries?: Record<string, any>,
+) {
+  let path = generatePath(route.path, params as any);
+  const location = useLocation();
+  const search = new URLSearchParams(location.search);
+
+  if (queries) {
+    for (let query in queries) {
+      search.set(query, queries[query]);
+    }
+    path += '?' + search.toString();
+  }
+
+  return path;
 }
 
 export function createRoute<T>(route: Route<T>): NonIndexRouteObject {
