@@ -311,3 +311,83 @@ export async function fakeRecords(
 
   return new Pagination(items, records.length, limit, page);
 }
+
+export async function fakeModels(
+  prop?:
+    | undefined
+    | {
+        timeout?: number;
+        limit?: number;
+        page?: number;
+        orderBy?: string;
+        orderAsc?: boolean;
+        filters?: {
+          beforeAt?: Date;
+          afterAt?: Date;
+          name?: string;
+          type?: string;
+        };
+      },
+): Promise<Pagination<Model>> {
+  const {
+    timeout = 200,
+    limit = 10,
+    page = 1,
+    orderBy = 'timestamp',
+    orderAsc = true,
+    filters,
+  } = prop ?? {};
+
+  await sleep(timeout);
+
+  let models: Model[];
+  if (Object.keys(fakeStorage.models).length < 20) {
+    const num = Math.round(Math.random() * 20);
+    models = [...Array(num).keys()].map(() => fakeModel());
+  } else {
+    models = Object.values(fakeStorage.models);
+  }
+
+  if (orderBy == 'id') {
+    models.sort((a, b) => a.modelId.localeCompare(b.modelId));
+  } else if (orderBy == 'timestamp') {
+    models.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
+  } else if (orderBy == 'name') {
+    models.sort((a, b) => a.modelName.localeCompare(b.modelName));
+  } else if (orderBy == 'type') {
+    models.sort((a, b) => a.type.typeName.localeCompare(b.type.typeName));
+  }
+
+  if (filters?.afterAt) {
+    models = models.filter(
+      (r) => r.timestamp.valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
+    );
+  }
+
+  if (filters?.beforeAt) {
+    models = models.filter(
+      (r) =>
+        r.timestamp.valueOf() <= (filters?.beforeAt?.valueOf() ?? Infinity),
+    );
+  }
+
+  if (filters?.name) {
+    models = models.filter((r) =>
+      r.modelName.toLowerCase().includes(filters.name?.toLowerCase() ?? ''),
+    );
+  }
+
+  if (filters?.type) {
+    models = models.filter((r) =>
+      r.type.typeName.toLowerCase().includes(filters.type?.toLowerCase() ?? ''),
+    );
+  }
+
+  if (!orderAsc) {
+    models.reverse();
+  }
+
+  const items = models.slice(limit * (page - 1), limit * page);
+
+  return new Pagination(items, models.length, limit, page);
+}
