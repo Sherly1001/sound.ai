@@ -391,3 +391,91 @@ export async function fakeModels(
 
   return new Pagination(items, models.length, limit, page);
 }
+
+export async function fakeDevices(
+  prop?:
+    | undefined
+    | {
+        timeout?: number;
+        limit?: number;
+        page?: number;
+        orderBy?: string;
+        orderAsc?: boolean;
+        filters?: {
+          beforeAt?: Date;
+          afterAt?: Date;
+          deviceName?: string;
+          modelName?: string;
+        };
+      },
+): Promise<Pagination<Device>> {
+  const {
+    timeout = 200,
+    limit = 10,
+    page = 1,
+    orderBy = 'timestamp',
+    orderAsc = true,
+    filters,
+  } = prop ?? {};
+
+  await sleep(timeout);
+
+  let devices: Device[];
+  if (Object.keys(fakeStorage.devices).length < 70) {
+    const num = Math.round(Math.random() * 70);
+    devices = [...Array(num).keys()].map(() => fakeDevice());
+  } else {
+    devices = Object.values(fakeStorage.devices);
+  }
+
+  if (orderBy == 'id') {
+    devices.sort((a, b) => a.deviceId.localeCompare(b.deviceId));
+  } else if (orderBy == 'timestamp') {
+    devices.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
+  } else if (orderBy == 'device') {
+    devices.sort((a, b) => a.deviceName.localeCompare(b.deviceName));
+  } else if (orderBy == 'model') {
+    devices.sort((a, b) =>
+      (a.currentModel?.modelName ?? '').localeCompare(
+        b.currentModel?.modelName ?? '',
+      ),
+    );
+  }
+
+  if (filters?.afterAt) {
+    devices = devices.filter(
+      (r) => r.timestamp.valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
+    );
+  }
+
+  if (filters?.beforeAt) {
+    devices = devices.filter(
+      (r) =>
+        r.timestamp.valueOf() <= (filters?.beforeAt?.valueOf() ?? Infinity),
+    );
+  }
+
+  if (filters?.deviceName) {
+    devices = devices.filter((r) =>
+      r.deviceName
+        .toLowerCase()
+        .includes(filters.deviceName?.toLowerCase() ?? ''),
+    );
+  }
+
+  if (filters?.modelName) {
+    devices = devices.filter((r) =>
+      r.currentModel?.modelName
+        .toLowerCase()
+        .includes(filters.modelName?.toLowerCase() ?? ''),
+    );
+  }
+
+  if (!orderAsc) {
+    devices.reverse();
+  }
+
+  const items = devices.slice(limit * (page - 1), limit * page);
+
+  return new Pagination(items, devices.length, limit, page);
+}
