@@ -1,6 +1,8 @@
 import {
   Box,
+  Button,
   Flex,
+  Input,
   Select,
   SlideFade,
   Table,
@@ -12,9 +14,13 @@ import {
   Tooltip,
   Tr,
 } from '@chakra-ui/react';
-import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCaretLeft,
+  faCaretRight,
+  faFilterCircleXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { routes } from '.';
 import Link from '../comps/Link';
 import Loading from '../comps/Loading';
@@ -26,7 +32,7 @@ import { facCaretUp } from '../custom-icons/caret-up';
 import { Record } from '../types';
 import { Pagination } from '../types/Pagination';
 import { fakeRecords } from '../utils/faker';
-import { genPageLinks, truncate, useQueries } from '../utils/funcs';
+import { dateString, genPageLinks, truncate, useQueries } from '../utils/funcs';
 
 export default function Records() {
   useEffect(() => {
@@ -56,6 +62,16 @@ export default function Records() {
   const [orderAsc, setOrderAsc] = useState(getOrderAsc());
   const [pageLinks, setPageLinks] = useState<number[][]>([[], [page], []]);
   const [data, setData] = useState<Pagination<Record> | null>(null);
+
+  const [filters, setFilters] = useState(
+    {} as {
+      beforeAt?: Date;
+      afterAt?: Date;
+      deviceName?: string;
+      temperature?: string;
+      humidity?: string;
+    },
+  );
 
   useEffect(() => {
     const limit = getLimit();
@@ -90,9 +106,20 @@ export default function Records() {
     if (data) setPageLinks(genPageLinks(data.page, data.totalPages));
   }, [data]);
 
+  const getBefore = useCallback(() => dateString(filters.beforeAt), [filters]);
+
+  const getAfter = useCallback(() => dateString(filters.afterAt), [filters]);
+
   const getData = useCallback(
-    () => fakeRecords({ limit, page, orderBy, orderAsc: orderAsc == 'asc' }),
-    [limit, page, orderBy, orderAsc],
+    () =>
+      fakeRecords({
+        limit,
+        page,
+        orderBy,
+        orderAsc: orderAsc == 'asc',
+        filters,
+      }),
+    [limit, page, orderBy, orderAsc, filters],
   );
 
   const headers = [
@@ -107,7 +134,100 @@ export default function Records() {
 
   return (
     <Box padding="5" position="relative">
-      <Rounded height="16" position="sticky" top="20" zIndex="sticky"></Rounded>
+      <Rounded
+        height="16"
+        position="sticky"
+        top="20"
+        zIndex="sticky"
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        as="form"
+        onSubmit={(e: FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+        }}
+      >
+        <Flex>
+          <Flex alignItems="center" marginX="4">
+            <Text marginX="2">After</Text>
+            <Input
+              value={getAfter() ?? ''}
+              onChange={(e) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  afterAt: new Date(e.target.value),
+                }))
+              }
+              type="datetime-local"
+              cursor="pointer"
+            />
+          </Flex>
+          <Flex alignItems="center" marginX="4">
+            <Text marginX="2">Before</Text>
+            <Input
+              value={getBefore() ?? ''}
+              onChange={(e) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  beforeAt: new Date(e.target.value),
+                }))
+              }
+              type="datetime-local"
+              cursor="pointer"
+            />
+          </Flex>
+        </Flex>
+        <Flex>
+          <Input
+            value={filters.deviceName ?? ''}
+            onChange={(e) =>
+              setFilters((filters) => ({
+                ...filters,
+                deviceName: e.target.value,
+              }))
+            }
+            placeholder="Device name"
+            minWidth="24"
+          />
+        </Flex>
+        <Flex>
+          <Tooltip hasArrow placement="top" label="number or min,max">
+            <Input
+              value={filters.temperature ?? ''}
+              onChange={(e) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  temperature: e.target.value,
+                }))
+              }
+              placeholder="Temperature"
+              maxWidth="32"
+              minWidth="20"
+              marginX="2"
+            />
+          </Tooltip>
+          <Tooltip hasArrow placement="top" label="number or min,max">
+            <Input
+              value={filters.humidity ?? ''}
+              onChange={(e) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  humidity: e.target.value,
+                }))
+              }
+              placeholder="Humidity"
+              maxWidth="32"
+              minWidth="20"
+              marginX="2"
+            />
+          </Tooltip>
+        </Flex>
+        <Flex>
+          <Button marginX="4" onClick={() => setFilters({})}>
+            <FontAwesomeIcon icon={faFilterCircleXmark} size="xl" />
+          </Button>
+        </Flex>
+      </Rounded>
       <Rounded marginY="4" height="65vh" overflow="auto">
         <Box>
           <Loading fader={SlideFade} getData={getData} setData={setData}>

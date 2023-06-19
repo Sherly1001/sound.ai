@@ -49,6 +49,24 @@ export function genPageLinks(page: number, totalPages: number) {
   return [prevs, [page], nexts];
 }
 
+export function dateString(date?: Date) {
+  if (!date) return;
+
+  const year = date.getFullYear();
+  let month: any = date.getMonth() + 1;
+  let day: any = date.getDate();
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+
+  if (isNaN(year)) return;
+
+  if (month < 10) month = '0' + month;
+  if (day < 10) day = '0' + day;
+
+  const res = `${year}-${month}-${day}T${hour}:${minute}`;
+  return res;
+}
+
 export function useQueries(): [
   URLSearchParams,
   (params: Record<string, string>) => void,

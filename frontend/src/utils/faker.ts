@@ -202,6 +202,13 @@ export async function fakeRecords(
         page?: number;
         orderBy?: string;
         orderAsc?: boolean;
+        filters?: {
+          beforeAt?: Date;
+          afterAt?: Date;
+          deviceName?: string;
+          temperature?: string;
+          humidity?: string;
+        };
       },
 ): Promise<Pagination<TRecord>> {
   const {
@@ -210,6 +217,7 @@ export async function fakeRecords(
     page = 1,
     orderBy = 'timestamp',
     orderAsc = true,
+    filters,
   } = prop ?? {};
 
   await sleep(timeout);
@@ -234,6 +242,65 @@ export async function fakeRecords(
     records.sort((a, b) => a.temperature - b.temperature);
   } else if (orderBy == 'humidity') {
     records.sort((a, b) => a.humidity - b.humidity);
+  }
+
+  if (filters?.afterAt) {
+    records = records.filter(
+      (r) => r.timestamp.valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
+    );
+  }
+
+  if (filters?.beforeAt) {
+    records = records.filter(
+      (r) =>
+        r.timestamp.valueOf() <= (filters?.beforeAt?.valueOf() ?? Infinity),
+    );
+  }
+
+  if (filters?.deviceName) {
+    records = records.filter((r) =>
+      r.device.deviceName
+        .toLowerCase()
+        .includes(filters.deviceName?.toLowerCase() ?? ''),
+    );
+  }
+
+  if (filters?.temperature) {
+    const values: number[] = filters.temperature
+      .split(',')
+      .slice(0, 2)
+      .map(Number);
+
+    if (values.length < 1) {
+    } else if (values.length < 2) {
+      records = records.filter((r) => r.temperature == values[0]);
+    } else {
+      if (values[0]) {
+        records = records.filter((r) => r.temperature >= values[0]);
+      }
+      if (values[1]) {
+        records = records.filter((r) => r.temperature <= values[1]);
+      }
+    }
+  }
+
+  if (filters?.humidity) {
+    const values: number[] = filters.humidity
+      .split(',')
+      .slice(0, 2)
+      .map(Number);
+
+    if (values.length < 1) {
+    } else if (values.length < 2) {
+      records = records.filter((r) => r.humidity == values[0]);
+    } else {
+      if (values[0]) {
+        records = records.filter((r) => r.humidity >= values[0]);
+      }
+      if (values[1]) {
+        records = records.filter((r) => r.humidity <= values[1]);
+      }
+    }
   }
 
   if (!orderAsc) {
