@@ -12,6 +12,18 @@ export const theme = extendTheme({
       body: {
         bg: 'background',
       },
+      '::-webkit-scrollbar': {
+        width: '1',
+      },
+      '::-webkit-scrollbar-track': {
+        background: '#F2F2F2',
+      },
+      '::-webkit-scrollbar-thumb': {
+        background: '#BDBDBD',
+      },
+      '::-webkit-scrollbar-thumb:hover': {
+        background: '#6E6E6E',
+      },
     }),
   },
 });
