@@ -50,12 +50,12 @@ const settings = from(home, {
 
 const login: Route = {
   path: '/login',
-  element: <Login register={true} />,
+  element: <Login />,
 };
 
 const register: Route = {
   path: '/register',
-  element: <Login />,
+  element: <Login register={true} />,
 };
 
 export const routes = {
