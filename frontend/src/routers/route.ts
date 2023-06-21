@@ -35,7 +35,6 @@ export function build<T>(
   queries?: Record<string, any>,
 ) {
   let path = generatePath(route.path, params as any);
-  const location = useLocation();
   const search = new URLSearchParams(location.search);
 
   if (queries) {
