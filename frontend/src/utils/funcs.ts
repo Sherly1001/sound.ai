@@ -1,6 +1,11 @@
 import { LatLng, LatLngBounds } from 'leaflet';
+import { abs, complex } from 'mathjs';
 import { useCallback } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import {
+  NavigateFunction,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom';
 
 export function getBounds(positions: LatLng[]) {
   if (positions.length < 1) return;
@@ -65,6 +70,30 @@ export function dateString(date?: Date) {
 
   const res = `${year}-${month}-${day}T${hour}:${minute}`;
   return res;
+}
+
+export function fftToArr(fft: string) {
+  return fft
+    .split(',')
+    .filter((s) => s)
+    .map((s) => s.replace('j', 'i'))
+    .map((s) => complex(s))
+    .map((c) => abs(c))
+    .map(Number);
+}
+
+export function historyBack(
+  history: string[],
+  navigate: NavigateFunction,
+  next?: string,
+) {
+  const prev = history[history.length - 2];
+
+  if (next && (!prev || prev != next)) {
+    navigate(next);
+  } else {
+    navigate(-1);
+  }
 }
 
 export function useQueries(): [

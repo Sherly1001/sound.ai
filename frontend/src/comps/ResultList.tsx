@@ -22,9 +22,10 @@ import { truncate } from '../utils/funcs';
 
 export interface Props {
   record?: Record;
+  truncateSize?: number;
 }
 
-export default function ResultList({ record }: Props) {
+export default function ResultList({ record, truncateSize = 25 }: Props) {
   const [currentResult, setCurrentResult] = useState(0);
   return record?.results && record?.results.length > 0 ? (
     <Flex height="100%" flexDirection="column">
@@ -34,12 +35,13 @@ export default function ResultList({ record }: Props) {
         label={record.results[currentResult]?.resultId}
       >
         <Select
+          textAlign="center"
           onChange={(e) => setCurrentResult(+e.target.value)}
           value={currentResult}
         >
           {record.results?.map((rs, idx) => (
             <option key={idx} value={idx}>
-              {truncate(rs.resultId, 25)}
+              {truncate(rs.resultId, truncateSize)}
             </option>
           ))}
         </Select>

@@ -18,14 +18,18 @@ export interface MapProps {
   bounds?: LatLngBounds;
 }
 
-export default function Map({ children, zoom = 12, bounds }: MapProps) {
+export default function Map({ children, zoom = 12, bounds, center }: MapProps) {
   const [firstLoad, setFirstLoad] = useState(true);
 
   const MapEvents = useCallback(() => {
     const map = useMapEvents({
       contextmenu(e) {
-        if (e.target == map && bounds) {
-          map.flyToBounds(bounds.pad(BOUNDS_PAD));
+        if (e.target == map) {
+          if (bounds) {
+            map.flyToBounds(bounds.pad(BOUNDS_PAD));
+          } else if (center) {
+            map.flyTo(center);
+          }
         }
       },
     });
@@ -43,7 +47,7 @@ export default function Map({ children, zoom = 12, bounds }: MapProps) {
   return (
     <MapContainer
       bounds={bounds?.pad(BOUNDS_PAD)}
-      center={bounds?.getCenter() ?? defaultCenter}
+      center={bounds?.getCenter() ?? center ?? defaultCenter}
       zoom={zoom}
       zoomSnap={0.5}
       style={{

@@ -21,38 +21,42 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { routes } from '.';
-import Link from '../comps/Link';
-import Loading from '../comps/Loading';
-import PlayAudio from '../comps/PlayAudio';
-import Rounded from '../comps/Rounded';
-import { facCaretDown, facCaretNone, facCaretUp } from '../custom-icons';
-import { Record } from '../types';
-import { Pagination } from '../types/Pagination';
-import { fakeRecords } from '../utils/faker';
-import { dateString, genPageLinks, truncate, useQueries } from '../utils/funcs';
+import { routes } from '..';
+import Link from '../../comps/Link';
+import Loading from '../../comps/Loading';
+import PlayAudio from '../../comps/PlayAudio';
+import Rounded from '../../comps/Rounded';
+import { facCaretDown, facCaretNone, facCaretUp } from '../../custom-icons';
+import { Record } from '../../types';
+import { Pagination } from '../../types/Pagination';
+import { fakeRecords } from '../../utils/faker';
+import {
+  dateString,
+  genPageLinks,
+  truncate,
+  useQueries,
+} from '../../utils/funcs';
 
-export default function Records() {
-  useEffect(() => {
-    document.title = 'Records';
-  }, []);
-
-  const [params, setParams] = useQueries();
+export default function RecordList() {
+  const [searchParams, setSearchParams] = useQueries();
 
   const getLimit = useCallback(
-    () => Number(params.get('limit')) || 10,
-    [params],
+    () => Number(searchParams.get('limit')) || 10,
+    [searchParams],
   );
-  const getPage = useCallback(() => Number(params.get('page')) || 1, [params]);
+  const getPage = useCallback(
+    () => Number(searchParams.get('page')) || 1,
+    [searchParams],
+  );
   const getOrderBy = useCallback(
-    () => params.get('orderBy') ?? 'timestamp',
-    [params],
+    () => searchParams.get('orderBy') ?? 'timestamp',
+    [searchParams],
   );
   const getOrderAsc = useCallback(() => {
-    const orderBy = params.get('orderBy');
-    const orderAsc = params.get('asc');
+    const orderBy = searchParams.get('orderBy');
+    const orderAsc = searchParams.get('asc');
     return orderAsc ?? (orderBy ? 'asc' : 'dsc');
-  }, [params]);
+  }, [searchParams]);
 
   const [limit, setLimit] = useState(getLimit());
   const [page, setPage] = useState(getPage());
@@ -81,24 +85,24 @@ export default function Records() {
     setOrderAsc(orderAsc);
 
     if (limit < 1) {
-      return setParams({ limit: '10' });
+      return setSearchParams({ limit: '10' });
     }
 
     setLimit(limit);
 
     if (page < 1) {
-      return setParams({ page: '1' });
+      return setSearchParams({ page: '1' });
     }
 
     if (data && page > data.totalPages) {
-      return setParams({
+      return setSearchParams({
         limit: limit.toString(),
         page: data.totalPages.toString(),
       });
     }
 
     setPage(page);
-  }, [params, data]);
+  }, [searchParams, data]);
 
   useEffect(() => {
     if (data) setPageLinks(genPageLinks(data.page, data.totalPages));
@@ -245,11 +249,11 @@ export default function Records() {
                       onClick={() => {
                         if (!h.order) return;
                         if (h.order == orderBy) {
-                          setParams({
+                          setSearchParams({
                             asc: orderAsc == 'asc' ? 'dsc' : 'asc',
                           });
                         } else {
-                          setParams({
+                          setSearchParams({
                             orderBy: h.order,
                             asc: 'asc',
                           });
@@ -323,7 +327,7 @@ export default function Records() {
           <Select
             marginX="1"
             value={limit}
-            onChange={(e) => setParams({ limit: e.target.value })}
+            onChange={(e) => setSearchParams({ limit: e.target.value })}
           >
             <option value="10">10</option>
             <option value="25">25</option>

@@ -1,14 +1,22 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from '../comps/Header';
 import Navbar from '../comps/Navbar';
+import { useStores } from '../stores';
 
 export default function Root() {
   const mainRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [headerOver, setHeaderOver] = useState(false);
+
+  const location = useLocation();
+  const { historyStore } = useStores();
+
+  useEffect(() => {
+    historyStore.push(location.pathname);
+  }, [location]);
 
   useEffect(() => {
     const scroll = () => {

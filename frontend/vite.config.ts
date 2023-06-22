@@ -8,7 +8,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
+          react: [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            'react-redux',
+            '@reduxjs/toolkit',
+          ],
           fontawesome: [
             '@fortawesome/fontawesome-svg-core',
             '@fortawesome/free-solid-svg-icons',
@@ -19,7 +25,9 @@ export default defineConfig({
             '@emotion/react',
             '@emotion/styled',
             'framer-motion',
+            'chakra-react-select',
           ],
+          chart: ['mathjs', 'chart.js', 'react-chartjs-2'],
           leaflet: ['leaflet', 'react-leaflet'],
           wave: ['wavesurfer.js'],
           faker: ['@faker-js/faker'],

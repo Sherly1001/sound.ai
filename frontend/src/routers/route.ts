@@ -4,7 +4,6 @@ import {
   createBrowserRouter,
   createHashRouter,
   generatePath,
-  useLocation,
 } from 'react-router-dom';
 
 export interface Route<T = {}> {

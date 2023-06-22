@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { complex } from 'mathjs';
 import {
   Device,
   Label,
@@ -146,7 +147,7 @@ export function fakeScores(labels: string[]): Score[] {
 export function fakeResult(
   id?: string,
   record?: TRecord,
-  model?: Model,
+  modelId?: string,
 ): Result {
   const num = Math.round(Math.random() * 20);
   const labels = [...Array(num).keys()].map(() => fakeLabel().labelId);
@@ -154,10 +155,29 @@ export function fakeResult(
   return {
     resultId: id ?? faker.string.uuid(),
     record: record ?? fakeRecord(),
-    model: model ?? fakeModel(),
+    model: fakeModel(modelId),
     scores: fakeScores(labels),
     timestamp: faker.date.past(),
   };
+}
+
+export function generateComplexArray(length: number) {
+  const complexArray = [];
+
+  for (let i = 0; i < length; i++) {
+    const real = faker.number.float({ min: -10, max: 10 });
+    const imag = faker.number.float({ min: -10, max: 10 });
+
+    complexArray.push(complex(real, imag));
+  }
+
+  return complexArray;
+}
+
+export function fakeFft() {
+  const num = faker.number.int({ min: 50, max: 200 });
+  const arr = generateComplexArray(num);
+  return arr.map((c) => c.toString().replace('i', 'j')).join(',');
 }
 
 export function fakeRecord(id?: string): TRecord {
@@ -172,7 +192,7 @@ export function fakeRecord(id?: string): TRecord {
     humidity: faker.number.int({ min: 0, max: 80 }),
     imageFilePath: faker.image.url(),
     audioFilePath: audio[Math.floor(Math.random() * audio.length)],
-    audioFft: '',
+    audioFft: fakeFft(),
     location: `${faker.number.float({
       min: 35.40488172230458,
       max: 36.54731312512536,
