@@ -33,11 +33,8 @@ const models = from(home, {
 });
 
 const devices = from(home, {
-  path: '/devices/:id?',
+  path: '/devices',
   element: <Devices />,
-  sampleParams: {
-    id: 'uuid',
-  },
 });
 
 const settings = from(home, {

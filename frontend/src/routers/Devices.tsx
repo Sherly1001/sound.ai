@@ -3,6 +3,14 @@ import {
   Button,
   Flex,
   Input,
+  InputGroup,
+  InputRightElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Select,
   SlideFade,
   Table,
@@ -17,7 +25,10 @@ import {
 import {
   faCaretLeft,
   faCaretRight,
+  faEye,
+  faEyeSlash,
   faFilterCircleXmark,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
@@ -30,6 +41,59 @@ import { Device } from '../types';
 import { Pagination } from '../types/Pagination';
 import { fakeDevices } from '../utils/faker';
 import { dateString, genPageLinks, truncate, useQueries } from '../utils/funcs';
+
+interface AddDeviceProps {
+  onClose: Function;
+}
+
+function AddDevice({ onClose }: AddDeviceProps) {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const onSubmit = useCallback(
+    (e: FormEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      console.log('create device', name, password);
+    },
+    [name, password],
+  );
+
+  return (
+    <Flex flexDirection="column" gap="4" as="form" onSubmit={onSubmit}>
+      <Input
+        placeholder="Device name"
+        required
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <InputGroup>
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Device password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <InputRightElement
+          cursor="pointer"
+          onClick={() => setShowPassword(!showPassword)}
+          userSelect="none"
+        >
+          <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+        </InputRightElement>
+      </InputGroup>
+      <Flex gap="4" marginY="4">
+        <Button colorScheme="blue" flex="1" type="submit">
+          Create
+        </Button>
+        <Button colorScheme="gray" flex="1" onClick={() => onClose()}>
+          Cancel
+        </Button>
+      </Flex>
+    </Flex>
+  );
+}
 
 export default function Devices() {
   useEffect(() => {
@@ -59,6 +123,8 @@ export default function Devices() {
   const [orderAsc, setOrderAsc] = useState(getOrderAsc());
   const [pageLinks, setPageLinks] = useState<number[][]>([[], [page], []]);
   const [data, setData] = useState<Pagination<Device> | null>(null);
+
+  const [newOpen, setNewOpen] = useState(false);
 
   const [filters, setFilters] = useState(
     {} as {
@@ -128,6 +194,16 @@ export default function Devices() {
 
   return (
     <Box padding="5" position="relative">
+      <Modal isOpen={newOpen} onClose={() => setNewOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalHeader>Create new device</ModalHeader>
+          <ModalBody>
+            <AddDevice onClose={() => setNewOpen(false)} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Rounded
         height="16"
         position="sticky"
@@ -204,6 +280,11 @@ export default function Devices() {
             <FontAwesomeIcon icon={faFilterCircleXmark} size="xl" />
           </Button>
         </Flex>
+        <Flex>
+          <Button marginEnd="4" onClick={() => setNewOpen(true)}>
+            <FontAwesomeIcon icon={faPlus} size="xl" />
+          </Button>
+        </Flex>
       </Rounded>
       <Rounded marginY="4" height="65vh" overflow="auto">
         <Box>
@@ -256,14 +337,9 @@ export default function Devices() {
                   <Tr key={idx}>
                     <Td>{idx + limit * (page - 1) + 1}</Td>
                     <Td>
-                      <Link
-                        to={routes.home.devices}
-                        params={{ id: r.deviceId }}
-                      >
-                        <Tooltip hasArrow placement="top" label={r.deviceId}>
-                          {truncate(r.deviceId, 15)}
-                        </Tooltip>
-                      </Link>
+                      <Tooltip hasArrow placement="top" label={r.deviceId}>
+                        {truncate(r.deviceId, 15)}
+                      </Tooltip>
                     </Td>
                     <Td>
                       <Tooltip
@@ -276,12 +352,15 @@ export default function Devices() {
                     </Td>
                     <Td>{r.deviceName}</Td>
                     <Td>
-                      <Text color="messenger.400">
+                      <Text
+                        color={r.currentModel ? 'messenger.400' : 'gray.400'}
+                      >
                         <Link
+                          disable={!r.currentModel}
                           to={routes.home.models}
                           params={{ id: r.currentModel?.modelId }}
                         >
-                          {r.currentModel?.modelName}
+                          {r.currentModel?.modelName ?? 'null'}
                         </Link>
                       </Text>
                     </Td>
