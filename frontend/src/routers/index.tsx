@@ -28,11 +28,8 @@ const records = from(home, {
 });
 
 const models = from(home, {
-  path: '/models/:id?',
+  path: '/models',
   element: <Models />,
-  sampleParams: {
-    id: 'uuid',
-  },
 });
 
 const devices = from(home, {

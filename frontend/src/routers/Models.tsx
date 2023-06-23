@@ -1,8 +1,15 @@
 import {
   Box,
   Button,
+  Link as CLink,
   Flex,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Select,
   SlideFade,
   Table,
@@ -17,10 +24,16 @@ import {
 import {
   faCaretLeft,
   faCaretRight,
+  faCheck,
+  faDownload,
+  faFileUpload,
   faFilterCircleXmark,
+  faPlus,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { CreatableSelect as CRSelect } from 'chakra-react-select';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { routes } from '.';
 import Link from '../comps/Link';
 import Loading from '../comps/Loading';
@@ -28,8 +41,103 @@ import Rounded from '../comps/Rounded';
 import { facCaretDown, facCaretNone, facCaretUp } from '../custom-icons';
 import { Model } from '../types';
 import { Pagination } from '../types/Pagination';
-import { fakeModels } from '../utils/faker';
+import { fakeModelTypes, fakeModels } from '../utils/faker';
 import { dateString, genPageLinks, truncate, useQueries } from '../utils/funcs';
+
+interface AddModelProps {
+  onClose: Function;
+}
+
+interface Option {
+  value: string;
+  label: string;
+  isNew?: boolean;
+}
+
+function AddModel({ onClose }: AddModelProps) {
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const [name, setName] = useState('');
+  const [file, setFile] = useState<File>();
+  const [type, setType] = useState<Option | null>(null);
+
+  const [typeFilter, setTypeFilter] = useState<string>();
+  const [options, setOptions] = useState<Option[]>([]);
+
+  useEffect(() => {
+    fakeModelTypes({ filters: { modelType: typeFilter } }).then((res) => {
+      const options = res.items.map(
+        (t) =>
+          ({
+            value: t.typeId,
+            label: t.typeName,
+          } as Option),
+      );
+
+      setOptions(options);
+    });
+  }, [typeFilter]);
+
+  const onSubmit = useCallback(
+    (e: FormEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      console.log(name, type, file);
+    },
+    [name, type, file],
+  );
+
+  return (
+    <Flex flexDirection="column" gap="4" as="form" onSubmit={onSubmit}>
+      <Input
+        placeholder="Model name"
+        required
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <CRSelect
+        placeholder="Model type"
+        required
+        isClearable
+        createOptionPosition="first"
+        value={type}
+        options={options}
+        onChange={(val) => setType(val)}
+        onInputChange={(val) => setTypeFilter(val)}
+        onCreateOption={(val) =>
+          setType({ value: val, label: val, isNew: true })
+        }
+      />
+      <Box>
+        <Button
+          width="100%"
+          variant="outline"
+          colorScheme={file ? 'blue' : 'gray'}
+          leftIcon={<FontAwesomeIcon icon={faFileUpload} />}
+          onClick={() => {
+            fileRef.current?.click();
+          }}
+        >
+          {file?.name ?? 'No file selected'}
+        </Button>
+        <Input
+          display="none"
+          type="file"
+          required
+          ref={fileRef}
+          onChange={(e) => setFile(e.target.files?.[0])}
+        />
+      </Box>
+      <Flex gap="4" marginY="4">
+        <Button colorScheme="blue" flex="1" type="submit">
+          Upload
+        </Button>
+        <Button colorScheme="gray" flex="1" onClick={() => onClose()}>
+          Cancel
+        </Button>
+      </Flex>
+    </Flex>
+  );
+}
 
 export default function Models() {
   useEffect(() => {
@@ -59,6 +167,9 @@ export default function Models() {
   const [orderAsc, setOrderAsc] = useState(getOrderAsc());
   const [pageLinks, setPageLinks] = useState<number[][]>([[], [page], []]);
   const [data, setData] = useState<Pagination<Model> | null>(null);
+
+  const [newOpen, setNewOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(-1);
 
   const [filters, setFilters] = useState(
     {} as {
@@ -118,16 +229,35 @@ export default function Models() {
     [limit, page, orderBy, orderAsc, filters],
   );
 
+  const deleteModel = useCallback(
+    (model: Model) => {
+      console.log('delete', model);
+      setConfirmDelete(-1);
+    },
+    [setConfirmDelete],
+  );
+
   const headers = [
     { name: '#' },
     { name: 'id', order: 'id' },
     { name: 'uploaded at', order: 'timestamp' },
     { name: 'name', order: 'name' },
     { name: 'type', order: 'type' },
+    { name: '' },
   ];
 
   return (
     <Box padding="5" position="relative">
+      <Modal isOpen={newOpen} onClose={() => setNewOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalHeader>Upload new model</ModalHeader>
+          <ModalBody>
+            <AddModel onClose={() => setNewOpen(false)} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Rounded
         height="16"
         position="sticky"
@@ -204,6 +334,11 @@ export default function Models() {
             <FontAwesomeIcon icon={faFilterCircleXmark} size="xl" />
           </Button>
         </Flex>
+        <Flex>
+          <Button marginEnd="4" onClick={() => setNewOpen(true)}>
+            <FontAwesomeIcon icon={faPlus} size="xl" />
+          </Button>
+        </Flex>
       </Rounded>
       <Rounded marginY="4" height="65vh" overflow="auto">
         <Box>
@@ -256,11 +391,9 @@ export default function Models() {
                   <Tr key={idx}>
                     <Td>{idx + limit * (page - 1) + 1}</Td>
                     <Td>
-                      <Link to={routes.home.models} params={{ id: r.modelId }}>
-                        <Tooltip hasArrow placement="top" label={r.modelId}>
-                          {truncate(r.modelId, 15)}
-                        </Tooltip>
-                      </Link>
+                      <Tooltip hasArrow placement="top" label={r.modelId}>
+                        {truncate(r.modelId, 15)}
+                      </Tooltip>
                     </Td>
                     <Td>
                       <Tooltip
@@ -273,6 +406,35 @@ export default function Models() {
                     </Td>
                     <Td>{r.modelName}</Td>
                     <Td>{r.type.typeName ?? ''}</Td>
+                    <Td>
+                      <Flex>
+                        <Button
+                          marginEnd="2"
+                          background="green.300"
+                          _hover={{ background: 'green.400' }}
+                        >
+                          <CLink href={r.modelFilePath}>
+                            <FontAwesomeIcon icon={faDownload} />
+                          </CLink>
+                        </Button>
+                        <Button
+                          background="red.300"
+                          _hover={{ background: 'red.400' }}
+                          onClick={() => {
+                            if (confirmDelete == idx) {
+                              deleteModel(data.items[idx]);
+                            } else {
+                              setConfirmDelete(idx);
+                            }
+                          }}
+                          onBlur={() => setConfirmDelete(-1)}
+                        >
+                          <FontAwesomeIcon
+                            icon={confirmDelete == idx ? faCheck : faTrash}
+                          />
+                        </Button>
+                      </Flex>
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>

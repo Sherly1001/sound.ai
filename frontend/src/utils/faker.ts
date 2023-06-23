@@ -74,6 +74,12 @@ export function fakeModelType(id?: string): ModelType {
     return fakeStorage.types[id];
   }
 
+  const keys = Object.keys(fakeStorage.types);
+  if (keys.length > 20) {
+    const idx = Math.floor(Math.random() * (keys.length - 1));
+    return fakeStorage.types[keys[idx]];
+  }
+
   const type = {
     typeId: faker.string.uuid(),
     typeName: faker.lorem.word(),
@@ -81,6 +87,54 @@ export function fakeModelType(id?: string): ModelType {
 
   fakeStorage.types[type.typeId] = type;
   return type;
+}
+
+export async function fakeModelTypes(
+  prop?:
+    | undefined
+    | {
+        timeout?: number;
+        limit?: number;
+        page?: number;
+        orderBy?: string;
+        orderAsc?: boolean;
+        filters?: {
+          modelType?: string;
+        };
+      },
+) {
+  const {
+    timeout = 200,
+    limit = 10,
+    page = 1,
+    orderBy = 'timestamp',
+    orderAsc = true,
+    filters,
+  } = prop ?? {};
+
+  await sleep(timeout);
+
+  let types = Object.values(fakeStorage.types);
+
+  if (orderBy == 'id') {
+    types.sort((a, b) => a.typeId.localeCompare(b.typeId));
+  } else if (orderBy == 'type') {
+    types.sort((a, b) => a.typeName.localeCompare(b.typeName));
+  }
+
+  if (filters?.modelType) {
+    types = types.filter((r) =>
+      r.typeName.toLowerCase().includes(filters.modelType?.toLowerCase() ?? ''),
+    );
+  }
+
+  if (!orderAsc) {
+    types.reverse();
+  }
+
+  const items = types.slice(limit * (page - 1), limit * page);
+
+  return new Pagination(items, types.length, limit, page);
 }
 
 export function fakeModel(id?: string): Model {
@@ -91,6 +145,7 @@ export function fakeModel(id?: string): Model {
   const model = {
     modelId: id ?? faker.string.uuid(),
     modelName: 'Model ' + faker.lorem.word(),
+    modelFilePath: '#',
     type: fakeModelType(),
     timestamp: faker.date.past(),
   };
