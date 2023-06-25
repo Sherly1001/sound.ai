@@ -33,6 +33,7 @@ import Rounded from '../../comps/Rounded';
 import ReactWaveSurfer from '../../comps/WaveSurfer';
 import { Model, Record } from '../../types';
 import { Result } from '../../types/Result';
+import { BLUE_MARKER } from '../../utils/const';
 import { fakeModels, fakeRecord, fakeResult } from '../../utils/faker';
 import { locationToLatLng } from '../../utils/funcs';
 
@@ -250,6 +251,7 @@ export default function RecordDetail() {
             {record && (
               <Map center={locationToLatLng(record.location)}>
                 <Marker
+                  icon={BLUE_MARKER}
                   position={locationToLatLng(record.location)}
                   eventHandlers={{
                     add(e) {

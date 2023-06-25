@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { facDeepLearning } from '../custom-icons';
 
 import { Box, Grid, HStack, Text, VStack } from '@chakra-ui/react';
-import { Icon, Marker as LMarker } from 'leaflet';
+import { Marker as LMarker } from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import { routes } from '.';
@@ -18,10 +18,10 @@ import Map from '../comps/Map';
 import RecordInfo from '../comps/RecordInfo';
 import Rounded from '../comps/Rounded';
 import { Record } from '../types';
-import { RED_MARKER } from '../utils/const';
+import { Pagination } from '../types/Pagination';
+import { BLUE_MARKER, RED_MARKER } from '../utils/const';
 import { fakeRecords } from '../utils/faker';
 import { getBounds, locationToLatLng } from '../utils/funcs';
-import { Pagination } from '../types/Pagination';
 
 const stas = () => [
   {
@@ -107,7 +107,7 @@ export default function Dashboard() {
                 <Marker
                   key={idx}
                   position={locationToLatLng(dt.location)}
-                  icon={idx == currentData ? RED_MARKER : new Icon.Default()}
+                  icon={idx == currentData ? RED_MARKER : BLUE_MARKER}
                   eventHandlers={{
                     popupopen(_e) {
                       setCurrentData(idx);
