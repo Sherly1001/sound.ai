@@ -72,7 +72,12 @@ export default function Dashboard() {
           gap={{ base: '5', xl: '6', '2xl': '8' }}
         >
           {stas().map((st, idx) => (
-            <Rounded key={idx} flex="1" padding="5" gridColumn="span 3">
+            <Rounded
+              key={idx}
+              flex="1"
+              padding="5"
+              gridColumn={{ base: 'span 6', md: 'span 3' }}
+            >
               <Link to={st.link}>
                 <HStack>
                   <Box background="background" padding="3" borderRadius="5">
@@ -91,7 +96,7 @@ export default function Dashboard() {
           <Rounded
             height="65vh"
             padding="2"
-            gridColumn={{ base: '1/9', xl: '1/10' }}
+            gridColumn={{ base: 'span 12', md: 'span 8', xl: 'span 9' }}
           >
             <Map
               bounds={getBounds(
@@ -141,7 +146,7 @@ export default function Dashboard() {
           <Rounded
             height="65vh"
             padding="2"
-            gridColumn={{ base: 'span 4', xl: 'span 3' }}
+            gridColumn={{ base: 'span 12', md: 'span 4', xl: 'span 3' }}
           >
             <RecordInfo record={datapoints[currentData]} />
           </Rounded>

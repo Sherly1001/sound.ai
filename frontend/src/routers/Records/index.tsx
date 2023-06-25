@@ -45,7 +45,7 @@ export default function Records() {
             <Text>Record: {params.id}</Text>
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody background="background">
+          <ModalBody background="background" padding={{ base: 0, md: 'unset' }}>
             <RecordDetail />
           </ModalBody>
         </ModalContent>

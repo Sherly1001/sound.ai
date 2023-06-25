@@ -209,10 +209,15 @@ export default function RecordDetail() {
         <Grid
           gap="4"
           margin="4"
-          gridTemplate="repeat(5, 12vh) / repeat(5, 1fr)"
+          gridTemplate={{
+            base: '25vh 50vh 60vh/1fr',
+            md: 'repeat(5, 12vh) / repeat(5, 1fr)',
+          }}
+          maxHeight={{ base: '80vh', md: 'unset' }}
+          overflow="auto"
         >
           <Rounded
-            gridArea="1/1/span 2/span 3"
+            gridArea={{ md: '1/1/span 2/span 3' }}
             display="flex"
             flexDirection="column"
           >
@@ -241,7 +246,7 @@ export default function RecordDetail() {
               </TabPanels>
             </Tabs>
           </Rounded>
-          <Rounded gridArea="3/1/span 3/span 3">
+          <Rounded gridArea={{ md: '3/1/span 3/span 3' }}>
             {record && (
               <Map center={locationToLatLng(record.location)}>
                 <Marker
@@ -269,7 +274,7 @@ export default function RecordDetail() {
             )}
           </Rounded>
           <Rounded
-            gridArea="1/4/span 5/span 2"
+            gridArea={{ base: '2/auto/auto/auto', md: '1/4/span 5/span 2' }}
             padding="2"
             display="flex"
             flexDirection="column"

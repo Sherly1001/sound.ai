@@ -123,17 +123,18 @@ export default function Devices() {
   const [orderAsc, setOrderAsc] = useState(getOrderAsc());
   const [pageLinks, setPageLinks] = useState<number[][]>([[], [page], []]);
   const [data, setData] = useState<Pagination<Device> | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const [newOpen, setNewOpen] = useState(false);
 
-  const [filters, setFilters] = useState(
-    {} as {
-      beforeAt?: Date;
-      afterAt?: Date;
-      deviceName?: string;
-      modelName?: string;
-    },
-  );
+  type FiltersType = {
+    beforeAt?: Date;
+    afterAt?: Date;
+    deviceName?: string;
+    modelName?: string;
+  };
+
+  const [filters, setFilters] = useState<FiltersType>({});
 
   useEffect(() => {
     const limit = getLimit();
@@ -192,34 +193,17 @@ export default function Devices() {
     { name: 'current model', order: 'model' },
   ];
 
-  return (
-    <Box padding="5" position="relative">
-      <Modal isOpen={newOpen} onClose={() => setNewOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalHeader>Create new device</ModalHeader>
-          <ModalBody>
-            <AddDevice onClose={() => setNewOpen(false)} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <Rounded
-        height="16"
-        position="sticky"
-        top="20"
-        zIndex="sticky"
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        as="form"
-        onSubmit={(e: FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-        }}
+  const Filters = useCallback(({ filters }: { filters: FiltersType }) => {
+    return (
+      <Flex
+        flexDirection={{ base: 'column', md: 'row' }}
+        gap={{ base: '2', md: '0' }}
       >
-        <Flex>
-          <Flex alignItems="center" marginX="4">
-            <Text marginX="2">After</Text>
+        <Flex flexDirection={{ base: 'column', md: 'row' }}>
+          <Flex alignItems="center" marginX={{ base: '0', md: '4' }}>
+            <Text marginX="2" minWidth={{ base: '12', md: 'unset' }}>
+              After
+            </Text>
             <Input
               value={getAfter() ?? ''}
               onChange={(e) =>
@@ -228,12 +212,15 @@ export default function Devices() {
                   afterAt: new Date(e.target.value),
                 }))
               }
+              size="sm"
               type="datetime-local"
               cursor="pointer"
             />
           </Flex>
-          <Flex alignItems="center" marginX="4">
-            <Text marginX="2">Before</Text>
+          <Flex alignItems="center" marginX={{ base: '0', md: '4' }}>
+            <Text marginX="2" minWidth={{ base: '12', md: 'unset' }}>
+              Before
+            </Text>
             <Input
               value={getBefore() ?? ''}
               onChange={(e) =>
@@ -242,6 +229,7 @@ export default function Devices() {
                   beforeAt: new Date(e.target.value),
                 }))
               }
+              size="sm"
               type="datetime-local"
               cursor="pointer"
             />
@@ -258,7 +246,7 @@ export default function Devices() {
             }
             placeholder="Device name"
             minWidth="24"
-            marginX="2"
+            marginX={{ base: '0', md: '2' }}
           />
         </Flex>
         <Flex>
@@ -272,18 +260,71 @@ export default function Devices() {
             }
             placeholder="Model name"
             minWidth="24"
-            marginX="2"
+            marginX={{ base: '0', md: '2' }}
           />
         </Flex>
-        <Flex>
+        <Flex display={{ base: 'none', md: 'flex' }}>
           <Button marginX="4" onClick={() => setFilters({})}>
             <FontAwesomeIcon icon={faFilterCircleXmark} size="xl" />
           </Button>
         </Flex>
-        <Flex>
+        <Flex display={{ base: 'none', md: 'flex' }}>
           <Button marginEnd="4" onClick={() => setNewOpen(true)}>
             <FontAwesomeIcon icon={faPlus} size="xl" />
           </Button>
+        </Flex>
+      </Flex>
+    );
+  }, []);
+
+  return (
+    <Box padding="5" position="relative">
+      <Modal isOpen={newOpen} onClose={() => setNewOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalHeader>Create new device</ModalHeader>
+          <ModalBody>
+            <AddDevice onClose={() => setNewOpen(false)} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Rounded
+        height="16"
+        position="sticky"
+        top="0"
+        zIndex="sticky"
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        as="form"
+        onSubmit={(e: FormEvent<HTMLFormElement>) => {
+          e.preventDefault();
+        }}
+      >
+        <Modal isOpen={filterOpen} onClose={() => setFilterOpen(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              <ModalCloseButton />
+              <Text>Filters</Text>
+            </ModalHeader>
+            <ModalBody>
+              <Filters filters={filters} />
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        <Flex
+          display={{ base: 'flex', md: 'none' }}
+          paddingX="2"
+          flex="1"
+          justifyContent="space-between"
+        >
+          <Button onClick={() => setFilterOpen(true)}>Filters</Button>
+          <Button onClick={() => setFilters({})}>Clear filters</Button>
+        </Flex>
+        <Flex display={{ base: 'none', md: 'flex' }}>
+          <Filters filters={filters} />
         </Flex>
       </Rounded>
       <Rounded marginY="4" height="65vh" overflow="auto">
@@ -371,23 +412,12 @@ export default function Devices() {
           </Loading>
         </Box>
       </Rounded>
-      <Flex userSelect="none">
-        <Flex alignItems="center">
-          Showing{' '}
-          <Select
-            marginX="1"
-            value={limit}
-            onChange={(e) => setParams({ limit: e.target.value })}
-          >
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </Select>{' '}
-          rows
-        </Flex>
-        <Box flex="1" />
-        <Box>
+      <Flex
+        userSelect="none"
+        flexDirection={{ base: 'column', md: 'row-reverse' }}
+        justifyContent="space-between"
+      >
+        <Box alignSelf="flex-end">
           <Text
             color={data?.hasPrev ? 'blue.500' : 'gray.500'}
             as="span"
@@ -446,6 +476,20 @@ export default function Devices() {
             </Link>
           </Text>
         </Box>
+        <Flex alignItems="center" alignSelf="flex-start">
+          Showing{' '}
+          <Select
+            marginX="1"
+            value={limit}
+            onChange={(e) => setParams({ limit: e.target.value })}
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </Select>{' '}
+          rows
+        </Flex>
       </Flex>
     </Box>
   );

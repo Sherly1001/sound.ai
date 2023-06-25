@@ -47,14 +47,14 @@ export default function Navbar() {
   return (
     <Flex
       minW="240px"
-      height="100vh"
       padding="1em"
       top="0"
-      position="sticky"
       background="white"
       boxShadow="0px 0px 4px 0px #00000040"
       direction="column"
       userSelect="none"
+      height={{ base: '100%', md: '100vh' }}
+      position={{ md: 'sticky' }}
     >
       <Link to={routes.home}>
         <Image src="/logo.png" width="50%" margin="0 auto" />
