@@ -40,7 +40,7 @@ export default function Records() {
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent minHeight="80vh" minWidth="70vw">
+        <ModalContent minHeight={{ base: '100vh', md: '80vh' }} minWidth="70vw">
           <ModalHeader>
             <Text>Record: {params.id}</Text>
           </ModalHeader>

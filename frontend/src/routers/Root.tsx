@@ -30,13 +30,27 @@ export default function Root() {
   }, [location]);
 
   useEffect(() => {
+    let lastScroll = 0;
     const scroll = () => {
       if (!mainRef.current || !headerRef.current) return;
 
-      setHeaderOver(
-        Math.round(mainRef.current.getBoundingClientRect().top) <
-          Math.round(headerRef.current.getBoundingClientRect().bottom),
+      const mainTop = Math.round(mainRef.current.getBoundingClientRect().top);
+      const headerBottom = Math.round(
+        headerRef.current.getBoundingClientRect().bottom,
       );
+
+      const headerPadding = Number(
+        getComputedStyle(headerRef.current).paddingBottom.replace('px', ''),
+      );
+
+      let add = 0;
+      if (lastScroll <= window.scrollY) {
+        add = headerPadding;
+      }
+
+      lastScroll = window.scrollY;
+
+      setHeaderOver(mainTop < headerBottom + add);
     };
 
     window.addEventListener('scroll', scroll);
@@ -86,6 +100,7 @@ export default function Root() {
         <Box
           ref={mainRef}
           width={{ base: '100vw', md: '100%', lg: '95%', xl: '90%' }}
+          paddingBottom={{ base: '8', md: 'unset' }}
           margin="auto"
           overflow="auto"
         >

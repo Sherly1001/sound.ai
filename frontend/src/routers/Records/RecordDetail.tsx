@@ -210,7 +210,7 @@ export default function RecordDetail() {
           gap="4"
           margin="4"
           gridTemplate={{
-            base: '25vh 50vh 60vh/1fr',
+            base: '200px 80vh 60vh/1fr',
             md: 'repeat(5, 12vh) / repeat(5, 1fr)',
           }}
           maxHeight={{ base: '80vh', md: 'unset' }}
@@ -227,7 +227,7 @@ export default function RecordDetail() {
                 <Tab>Fast Fourier Transform</Tab>
               </TabList>
               <TabPanels height={0} flex="1" overflow="auto">
-                <TabPanel>
+                <TabPanel width={{ base: '90vw', md: 'unset' }}>
                   <ReactWaveSurfer
                     options={{
                       height: 100,

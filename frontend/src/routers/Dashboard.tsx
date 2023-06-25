@@ -144,7 +144,7 @@ export default function Dashboard() {
             </Map>
           </Rounded>
           <Rounded
-            height="65vh"
+            height={{ base: '80vh', md: '65vh' }}
             padding="2"
             gridColumn={{ base: 'span 12', md: 'span 4', xl: 'span 3' }}
           >
