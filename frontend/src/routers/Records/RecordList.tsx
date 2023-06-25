@@ -144,6 +144,8 @@ export default function RecordList() {
   const Filters = useCallback(({ filters }: { filters: FiltersType }) => {
     return (
       <Flex
+        flex="1"
+        justifyContent="space-between"
         flexDirection={{ base: 'column', md: 'row' }}
         gap={{ base: '2', md: '0' }}
       >
@@ -183,7 +185,7 @@ export default function RecordList() {
             />
           </Flex>
         </Flex>
-        <Flex>
+        <Flex flex="1">
           <Input
             value={filters.deviceName ?? ''}
             onChange={(e) =>
@@ -273,7 +275,7 @@ export default function RecordList() {
           <Button onClick={() => setFilterOpen(true)}>Filters</Button>
           <Button onClick={() => setFilters({})}>Clear filters</Button>
         </Flex>
-        <Flex display={{ base: 'none', md: 'flex' }}>
+        <Flex display={{ base: 'none', md: 'flex' }} flex="1">
           <Filters filters={filters} />
         </Flex>
       </Rounded>

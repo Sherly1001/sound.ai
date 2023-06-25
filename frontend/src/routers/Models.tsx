@@ -250,6 +250,8 @@ export default function Models() {
   const Filters = useCallback(({ filters }: { filters: FiltersType }) => {
     return (
       <Flex
+        flex="1"
+        justifyContent="space-between"
         flexDirection={{ base: 'column', md: 'row' }}
         gap={{ base: '2', md: '0' }}
       >
@@ -321,8 +323,6 @@ export default function Models() {
           <Button marginX="4" onClick={() => setFilters({})}>
             <FontAwesomeIcon icon={faFilterCircleXmark} size="xl" />
           </Button>
-        </Flex>
-        <Flex display={{ base: 'none', md: 'flex' }}>
           <Button marginEnd="4" onClick={() => setNewOpen(true)}>
             <FontAwesomeIcon icon={faPlus} size="xl" />
           </Button>
@@ -380,7 +380,7 @@ export default function Models() {
             <FontAwesomeIcon icon={faPlus} size="xl" />
           </Button>
         </Flex>
-        <Flex display={{ base: 'none', md: 'flex' }}>
+        <Flex display={{ base: 'none', md: 'flex' }} flex="1">
           <Filters filters={filters} />
         </Flex>
       </Rounded>
