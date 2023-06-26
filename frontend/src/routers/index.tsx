@@ -1,3 +1,4 @@
+import { HASH_ROUTE } from '../utils/const';
 import Dashboard from './Dashboard';
 import Devices from './Devices';
 import Login from './Login';
@@ -64,4 +65,4 @@ export const routes = {
   register,
 };
 
-export const routers = createRouters(routes);
+export const routers = createRouters(routes, HASH_ROUTE);
