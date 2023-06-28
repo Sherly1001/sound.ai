@@ -8,13 +8,21 @@ import { facDashboard, facDeepLearning, facRighRect } from '../custom-icons';
 
 import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { routes } from '../routers';
 import { build } from '../routers/route';
+import { useStores } from '../stores';
 import Link from './Link';
 
 export default function Navbar() {
   const location = useLocation();
+
+  const { userStore } = useStores();
+
+  const onLogout = useCallback(() => {
+    userStore.logout();
+  }, [userStore]);
 
   const navLinks = [
     {
@@ -107,6 +115,7 @@ export default function Navbar() {
         _hover={{
           color: 'messenger.400',
         }}
+        onClick={() => onLogout()}
       >
         Logout
       </Button>

@@ -82,6 +82,19 @@ export function fftToArr(fft: string) {
     .map(Number);
 }
 
+export function storageSetItem<T>(name: string, data: T) {
+  localStorage.setItem(name, JSON.stringify(data));
+}
+
+export function storageGetItem<T>(name: string): T | undefined {
+  const val = localStorage.getItem(name);
+  return val ? JSON.parse(val) : undefined;
+}
+
+export function storageRemoveItem(name: string) {
+  localStorage.removeItem(name);
+}
+
 export function historyBack(
   history: string[],
   navigate: NavigateFunction,

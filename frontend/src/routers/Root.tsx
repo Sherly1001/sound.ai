@@ -10,10 +10,12 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { routes } from '.';
 import Header from '../comps/Header';
 import Navbar from '../comps/Navbar';
 import { useStores } from '../stores';
+import { build } from './route';
 
 export default function Root() {
   const mainRef = useRef<HTMLDivElement>(null);
@@ -23,11 +25,18 @@ export default function Root() {
   const [headerOver, setHeaderOver] = useState(false);
 
   const location = useLocation();
-  const { historyStore } = useStores();
+  const navigate = useNavigate();
+  const { historyStore, userStore } = useStores();
 
   useEffect(() => {
     historyStore.push(location.pathname);
   }, [location]);
+
+  useEffect(() => {
+    if (!userStore.user) {
+      navigate(build(routes.login));
+    }
+  }, [userStore]);
 
   useEffect(() => {
     let lastScroll = 0;
