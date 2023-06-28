@@ -1,3 +1,18 @@
+export interface PageQuery {
+  limit?: number;
+  page?: number;
+}
+
+export interface TimeQuery {
+  afterAt?: Date;
+  beforeAt?: Date;
+}
+
+export interface OrderQuery {
+  orderBy?: string;
+  orderASC?: boolean;
+}
+
 export class Pagination<T> {
   items: T[];
   count: number;

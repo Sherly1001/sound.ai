@@ -21,6 +21,7 @@ import {
   Thead,
   Tooltip,
   Tr,
+  useToast,
 } from '@chakra-ui/react';
 import {
   faCaretLeft,
@@ -37,24 +38,54 @@ import Link from '../comps/Link';
 import Loading from '../comps/Loading';
 import Rounded from '../comps/Rounded';
 import { facCaretDown, facCaretNone, facCaretUp } from '../custom-icons';
+import { deviceService } from '../services';
 import { Device } from '../types';
 import { Pagination } from '../types/Pagination';
-import { fakeDevices } from '../utils/faker';
 import { dateString, genPageLinks, truncate, useQueries } from '../utils/funcs';
 
 interface AddDeviceProps {
   onClose: Function;
+  onCreated: (dev: Device) => void;
 }
 
-function AddDevice({ onClose }: AddDeviceProps) {
+function AddDevice({ onClose, onCreated }: AddDeviceProps) {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const toast = useToast();
+
   const onSubmit = useCallback(
     (e: FormEvent<HTMLDivElement>) => {
       e.preventDefault();
-      console.log('create device', name, password);
+
+      const toastId = toast({
+        position: 'top-right',
+        status: 'info',
+        description: 'Creating new device',
+      });
+
+      deviceService
+        .create(name, password)
+        .then((res) => {
+          if (res.data) {
+            toast.update(toastId, {
+              status: 'success',
+              description: 'Created new device',
+            });
+
+            onCreated(res.data);
+            onClose();
+          } else {
+            throw 'Device name already exists';
+          }
+        })
+        .catch((err) => {
+          toast.update(toastId, {
+            status: 'error',
+            description: err.toString(),
+          });
+        });
     },
     [name, password],
   );
@@ -131,7 +162,7 @@ export default function Devices() {
     beforeAt?: Date;
     afterAt?: Date;
     deviceName?: string;
-    modelName?: string;
+    currentModel?: string;
   };
 
   const [filters, setFilters] = useState<FiltersType>({});
@@ -169,28 +200,27 @@ export default function Devices() {
     if (data) setPageLinks(genPageLinks(data.page, data.totalPages));
   }, [data]);
 
-  const getBefore = useCallback(() => dateString(filters.beforeAt), [filters]);
-
-  const getAfter = useCallback(() => dateString(filters.afterAt), [filters]);
-
   const getData = useCallback(
     () =>
-      fakeDevices({
-        limit,
-        page,
-        orderBy,
-        orderAsc: orderAsc == 'asc',
-        filters,
-      }),
+      deviceService
+        .list({
+          limit,
+          page,
+          orderBy,
+          orderASC: orderAsc == 'asc',
+          ...filters,
+        })
+        .then((res) => res.data ?? null)
+        .catch((err) => (console.debug(err), null)),
     [limit, page, orderBy, orderAsc, filters],
   );
 
   const headers = [
     { name: '#' },
-    { name: 'id', order: 'id' },
-    { name: 'uploaded at', order: 'timestamp' },
-    { name: 'device name', order: 'name' },
-    { name: 'current model', order: 'model' },
+    { name: 'id', order: 'deviceId' },
+    { name: 'created at', order: 'timestamp' },
+    { name: 'device name', order: 'deviceName' },
+    { name: 'current model', order: 'currentModel' },
   ];
 
   const Filters = useCallback(({ filters }: { filters: FiltersType }) => {
@@ -207,7 +237,7 @@ export default function Devices() {
               After
             </Text>
             <Input
-              value={getAfter() ?? ''}
+              value={dateString(filters.afterAt) ?? ''}
               onChange={(e) =>
                 setFilters((filters) => ({
                   ...filters,
@@ -224,7 +254,7 @@ export default function Devices() {
               Before
             </Text>
             <Input
-              value={getBefore() ?? ''}
+              value={dateString(filters.beforeAt) ?? ''}
               onChange={(e) =>
                 setFilters((filters) => ({
                   ...filters,
@@ -253,11 +283,11 @@ export default function Devices() {
         </Flex>
         <Flex>
           <Input
-            value={filters.modelName ?? ''}
+            value={filters.currentModel ?? ''}
             onChange={(e) =>
               setFilters((filters) => ({
                 ...filters,
-                modelName: e.target.value,
+                currentModel: e.target.value,
               }))
             }
             placeholder="Model name"
@@ -285,7 +315,14 @@ export default function Devices() {
           <ModalCloseButton />
           <ModalHeader>Create new device</ModalHeader>
           <ModalBody>
-            <AddDevice onClose={() => setNewOpen(false)} />
+            <AddDevice
+              onClose={() => setNewOpen(false)}
+              onCreated={(dev: Device) =>
+                setData(
+                  (data) => data && { ...data, items: [dev, ...data.items] },
+                )
+              }
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -386,9 +423,9 @@ export default function Devices() {
                       <Tooltip
                         hasArrow
                         placement="top"
-                        label={(r.timestamp ?? new Date()).toLocaleString()}
+                        label={new Date(r.timestamp).toLocaleString()}
                       >
-                        {(r.timestamp ?? new Date()).toLocaleDateString()}
+                        {new Date(r.timestamp).toLocaleDateString()}
                       </Tooltip>
                     </Td>
                     <Td>{r.deviceName}</Td>

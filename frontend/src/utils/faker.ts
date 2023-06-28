@@ -308,7 +308,10 @@ export async function fakeRecords(
   if (orderBy == 'id') {
     records.sort((a, b) => a.recordId.localeCompare(b.recordId));
   } else if (orderBy == 'timestamp') {
-    records.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
+    records.sort(
+      (a, b) =>
+        new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf(),
+    );
   } else if (orderBy == 'device') {
     records.sort((a, b) =>
       a.device.deviceName.localeCompare(b.device.deviceName),
@@ -321,14 +324,16 @@ export async function fakeRecords(
 
   if (filters?.afterAt) {
     records = records.filter(
-      (r) => r.timestamp.valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
+      (r) =>
+        new Date(r.timestamp).valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
     );
   }
 
   if (filters?.beforeAt) {
     records = records.filter(
       (r) =>
-        r.timestamp.valueOf() <= (filters?.beforeAt?.valueOf() ?? Infinity),
+        new Date(r.timestamp).valueOf() <=
+        (filters?.beforeAt?.valueOf() ?? Infinity),
     );
   }
 
@@ -426,7 +431,10 @@ export async function fakeModels(
   if (orderBy == 'id') {
     models.sort((a, b) => a.modelId.localeCompare(b.modelId));
   } else if (orderBy == 'timestamp') {
-    models.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
+    models.sort(
+      (a, b) =>
+        new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf(),
+    );
   } else if (orderBy == 'name') {
     models.sort((a, b) => a.modelName.localeCompare(b.modelName));
   } else if (orderBy == 'type') {
@@ -435,14 +443,16 @@ export async function fakeModels(
 
   if (filters?.afterAt) {
     models = models.filter(
-      (r) => r.timestamp.valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
+      (r) =>
+        new Date(r.timestamp).valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
     );
   }
 
   if (filters?.beforeAt) {
     models = models.filter(
       (r) =>
-        r.timestamp.valueOf() <= (filters?.beforeAt?.valueOf() ?? Infinity),
+        new Date(r.timestamp).valueOf() <=
+        (filters?.beforeAt?.valueOf() ?? Infinity),
     );
   }
 
@@ -506,7 +516,10 @@ export async function fakeDevices(
   if (orderBy == 'id') {
     devices.sort((a, b) => a.deviceId.localeCompare(b.deviceId));
   } else if (orderBy == 'timestamp') {
-    devices.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
+    devices.sort(
+      (a, b) =>
+        new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf(),
+    );
   } else if (orderBy == 'device') {
     devices.sort((a, b) => a.deviceName.localeCompare(b.deviceName));
   } else if (orderBy == 'model') {
@@ -519,14 +532,16 @@ export async function fakeDevices(
 
   if (filters?.afterAt) {
     devices = devices.filter(
-      (r) => r.timestamp.valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
+      (r) =>
+        new Date(r.timestamp).valueOf() >= (filters?.afterAt?.valueOf() ?? 0),
     );
   }
 
   if (filters?.beforeAt) {
     devices = devices.filter(
       (r) =>
-        r.timestamp.valueOf() <= (filters?.beforeAt?.valueOf() ?? Infinity),
+        new Date(r.timestamp).valueOf() <=
+        (filters?.beforeAt?.valueOf() ?? Infinity),
     );
   }
 

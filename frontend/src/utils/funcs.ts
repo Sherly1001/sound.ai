@@ -60,13 +60,15 @@ export function dateString(date?: Date) {
   const year = date.getFullYear();
   let month: any = date.getMonth() + 1;
   let day: any = date.getDate();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
+  let hour: any = date.getHours();
+  let minute: any = date.getMinutes();
 
   if (isNaN(year)) return;
 
   if (month < 10) month = '0' + month;
   if (day < 10) day = '0' + day;
+  if (hour < 10) hour = '0' + hour;
+  if (minute < 10) minute = '0' + minute;
 
   const res = `${year}-${month}-${day}T${hour}:${minute}`;
   return res;

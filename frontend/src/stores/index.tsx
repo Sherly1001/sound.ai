@@ -22,10 +22,12 @@ export type RootState = ReturnType<typeof stores.getState>;
 
 export function useStores() {
   const dispatch = useDispatch();
-  const store = useSelector((st: RootState) => st);
 
-  const historyStore = createStore(HistorySlice, store.history, dispatch);
-  const userStore = createStore(UserSlice, store.user, dispatch);
+  const history = useSelector((st: RootState) => st.history);
+  const historyStore = createStore(HistorySlice, history, dispatch);
+
+  const user = useSelector((st: RootState) => st.user);
+  const userStore = createStore(UserSlice, user, dispatch);
 
   return { historyStore, userStore };
 }
