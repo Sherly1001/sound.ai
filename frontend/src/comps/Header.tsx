@@ -2,6 +2,7 @@ import { Box, Button, Flex, Select, Text } from '@chakra-ui/react';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ForwardedRef, forwardRef } from 'react';
+import { useStores } from '../stores';
 
 export interface HeaderProps {
   headerOver: boolean;
@@ -12,7 +13,8 @@ function Header(
   { headerOver, toggleNav }: HeaderProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const username = 'Username';
+  const { userStore } = useStores();
+
   const langs = [
     { value: 'en', name: 'English' },
     { value: 'jp', name: '日本語' },
@@ -48,7 +50,7 @@ function Header(
             color="black"
             display={{ base: 'none', md: 'block' }}
           >
-            Hello, {username}
+            Hello, {userStore.user?.username}
           </Text>
           <Text color="red.600">{new Date().toDateString()}</Text>
         </Flex>

@@ -16,5 +16,12 @@ export class UserDto {
   }
 }
 
-export class UserUpdateDto extends PartialType(UserDto) {}
-export class PartialUser extends PartialType(User) {}
+export class UserUpdateDto extends PartialType(UserDto) {
+  @ApiProperty()
+  currentPassword: string;
+}
+
+export class PartialUser extends PartialType(User) {
+  @ApiProperty()
+  currentPassword: string;
+}

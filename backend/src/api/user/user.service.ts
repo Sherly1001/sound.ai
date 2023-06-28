@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartialUser } from 'src/dtos/user.dto';
 import { User } from 'src/schema/entities';
@@ -40,6 +44,11 @@ export class UserService {
   ) {
     const user = await this.userRepo.findOneBy({ userId });
     if (!user) throw new NotFoundException(`UserId ${userId} not found`);
+
+    if (!user.checkPassword(payload.currentPassword)) {
+      throw new UnauthorizedException('Old password not match');
+    }
+
     if (!payload.hashPassword) delete user.hashPassword;
     const newUser = Object.assign(new User(), { ...user, ...payload });
     if (isAdmin) {

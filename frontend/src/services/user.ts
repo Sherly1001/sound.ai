@@ -27,4 +27,34 @@ export namespace userService {
       .catch((err) => err.response)
       .then((res) => res.data as BaseResult<User>);
   }
+
+  export async function update(
+    currentPassword: string,
+    username?: string,
+    password?: string,
+  ) {
+    return axiosInstance
+      .put(
+        'user/update',
+        { currentPassword, username, password },
+        {
+          headers: {
+            Authorization: 'Bearer ' + storageGetItem('token'),
+          },
+        },
+      )
+      .catch((err) => err.response)
+      .then((res) => res.data as BaseResult<User>);
+  }
+
+  export async function remove() {
+    return axiosInstance
+      .delete('user/remove', {
+        headers: {
+          Authorization: 'Bearer ' + storageGetItem('token'),
+        },
+      })
+      .catch((err) => err.response)
+      .then((res) => res.data as BaseResult<User>);
+  }
 }

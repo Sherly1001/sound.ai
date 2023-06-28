@@ -75,8 +75,6 @@ export default function Root() {
     }
   }, [headerOver]);
 
-  const username = 'Username';
-
   return (
     <Flex>
       <Drawer
@@ -89,7 +87,7 @@ export default function Root() {
           <DrawerHeader>
             <DrawerCloseButton />
             <Text fontSize="2xl" fontWeight="bold" color="black">
-              Hello, {username}
+              Hello, {userStore.user?.username}
             </Text>
           </DrawerHeader>
           <DrawerBody padding={0} margin={0}>
