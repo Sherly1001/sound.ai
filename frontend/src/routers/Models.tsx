@@ -20,6 +20,7 @@ import {
   Thead,
   Tooltip,
   Tr,
+  useToast,
 } from '@chakra-ui/react';
 import {
   faCaretLeft,
@@ -39,13 +40,16 @@ import Link from '../comps/Link';
 import Loading from '../comps/Loading';
 import Rounded from '../comps/Rounded';
 import { facCaretDown, facCaretNone, facCaretUp } from '../custom-icons';
+import { modelService } from '../services';
+import { useStores } from '../stores';
 import { Model } from '../types';
 import { Pagination } from '../types/Pagination';
-import { fakeModelTypes, fakeModels } from '../utils/faker';
+import { API_URL } from '../utils/const';
 import { dateString, genPageLinks, truncate, useQueries } from '../utils/funcs';
 
 interface AddModelProps {
   onClose: Function;
+  onCreated: (model: Model) => void;
 }
 
 interface Option {
@@ -54,7 +58,7 @@ interface Option {
   isNew?: boolean;
 }
 
-function AddModel({ onClose }: AddModelProps) {
+function AddModel({ onClose, onCreated }: AddModelProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState('');
@@ -64,26 +68,69 @@ function AddModel({ onClose }: AddModelProps) {
   const [typeFilter, setTypeFilter] = useState<string>();
   const [options, setOptions] = useState<Option[]>([]);
 
-  useEffect(() => {
-    fakeModelTypes({ filters: { modelType: typeFilter } }).then((res) => {
-      const options = res.items.map(
-        (t) =>
-          ({
-            value: t.typeId,
-            label: t.typeName,
-          } as Option),
-      );
+  const toast = useToast();
+  const { userStore } = useStores();
 
-      setOptions(options);
-    });
+  useEffect(() => {
+    modelService
+      .listType({
+        modelType: typeFilter,
+      })
+      .then((res) => {
+        if (!res.data) return;
+        const options = res.data.items.map(
+          (t) =>
+            ({
+              value: t.typeId,
+              label: t.typeName,
+            } as Option),
+        );
+
+        setOptions(options);
+      });
   }, [typeFilter]);
 
   const onSubmit = useCallback(
     (e: FormEvent<HTMLDivElement>) => {
       e.preventDefault();
-      console.log(name, type, file);
+      if (!name || !type || !file) return;
+
+      const upload = (type: string) => {
+        const toastId = toast({
+          position: 'top-right',
+          status: 'info',
+          description: 'Uploading new model',
+        });
+
+        modelService.upload(name, type, file).then((res) => {
+          if (res.data) {
+            toast.update(toastId, {
+              status: 'success',
+              description: 'Uploaded',
+            });
+
+            onCreated(res.data);
+            onClose();
+          } else {
+            toast.update(toastId, {
+              status: 'error',
+              description: res.error?.toString(),
+            });
+          }
+        });
+      };
+
+      if (type.isNew && userStore.user?.isAdmin) {
+        modelService.createType(type.value).then((res) => {
+          if (res.data) {
+            return upload(res.data.typeId);
+          }
+        });
+      } else {
+        upload(type.value);
+      }
     },
-    [name, type, file],
+    [name, type, file, userStore],
   );
 
   return (
@@ -95,6 +142,11 @@ function AddModel({ onClose }: AddModelProps) {
         onChange={(e) => setName(e.target.value)}
       />
       <CRSelect
+        isValidNewOption={(input) =>
+          !!input &&
+          !!userStore.user?.isAdmin &&
+          !options.find((o) => o.label == input)
+        }
         placeholder="Model type"
         required
         isClearable
@@ -122,7 +174,6 @@ function AddModel({ onClose }: AddModelProps) {
         <Input
           display="none"
           type="file"
-          required
           ref={fileRef}
           onChange={(e) => setFile(e.target.files?.[0])}
         />
@@ -144,6 +195,8 @@ export default function Models() {
     document.title = 'Models';
   }, []);
 
+  const toast = useToast();
+  const { userStore } = useStores();
   const [params, setParams] = useQueries();
 
   const getLimit = useCallback(
@@ -175,8 +228,8 @@ export default function Models() {
   type FiltersType = {
     beforeAt?: Date;
     afterAt?: Date;
-    name?: string;
-    type?: string;
+    modelName?: string;
+    modelType?: string;
   };
 
   const [filters, setFilters] = useState<FiltersType>({});
@@ -214,19 +267,18 @@ export default function Models() {
     if (data) setPageLinks(genPageLinks(data.page, data.totalPages));
   }, [data]);
 
-  const getBefore = useCallback(() => dateString(filters.beforeAt), [filters]);
-
-  const getAfter = useCallback(() => dateString(filters.afterAt), [filters]);
-
   const getData = useCallback(
     () =>
-      fakeModels({
-        limit,
-        page,
-        orderBy,
-        orderAsc: orderAsc == 'asc',
-        filters,
-      }),
+      modelService
+        .list({
+          limit,
+          page,
+          orderBy,
+          orderASC: orderAsc == 'asc',
+          ...filters,
+        })
+        .then((res) => res.data ?? null)
+        .catch((err) => (console.debug(err), null)),
     [limit, page, orderBy, orderAsc, filters],
   );
 
@@ -234,8 +286,38 @@ export default function Models() {
     (model: Model) => {
       console.log('delete', model);
       setConfirmDelete(-1);
+
+      if (userStore.user?.isAdmin) {
+        const toastId = toast({
+          position: 'top-right',
+          status: 'info',
+          description: 'Uploading new model',
+        });
+
+        modelService.remove(model.modelId).then((res) => {
+          if (res.data) {
+            toast.update(toastId, {
+              status: 'success',
+              description: 'Deleted',
+            });
+
+            setData(
+              (data) =>
+                data && {
+                  ...data,
+                  items: data.items.filter((m) => m.modelId != model.modelId),
+                },
+            );
+          } else {
+            toast.update(toastId, {
+              status: 'error',
+              description: res.error?.toString(),
+            });
+          }
+        });
+      }
     },
-    [setConfirmDelete],
+    [setConfirmDelete, userStore],
   );
 
   const headers = [
@@ -261,7 +343,7 @@ export default function Models() {
               After
             </Text>
             <Input
-              value={getAfter() ?? ''}
+              value={dateString(filters.afterAt) ?? ''}
               onChange={(e) =>
                 setFilters((filters) => ({
                   ...filters,
@@ -278,7 +360,7 @@ export default function Models() {
               Before
             </Text>
             <Input
-              value={getBefore() ?? ''}
+              value={dateString(filters.beforeAt) ?? ''}
               onChange={(e) =>
                 setFilters((filters) => ({
                   ...filters,
@@ -293,11 +375,11 @@ export default function Models() {
         </Flex>
         <Flex>
           <Input
-            value={filters.name ?? ''}
+            value={filters.modelName ?? ''}
             onChange={(e) =>
               setFilters((filters) => ({
                 ...filters,
-                name: e.target.value,
+                modelName: e.target.value,
               }))
             }
             placeholder="Model name"
@@ -307,11 +389,11 @@ export default function Models() {
         </Flex>
         <Flex>
           <Input
-            value={filters.type ?? ''}
+            value={filters.modelType ?? ''}
             onChange={(e) =>
               setFilters((filters) => ({
                 ...filters,
-                type: e.target.value,
+                modelType: e.target.value,
               }))
             }
             placeholder="Model type"
@@ -339,7 +421,14 @@ export default function Models() {
           <ModalCloseButton />
           <ModalHeader>Upload new model</ModalHeader>
           <ModalBody>
-            <AddModel onClose={() => setNewOpen(false)} />
+            <AddModel
+              onClose={() => setNewOpen(false)}
+              onCreated={(model) =>
+                setData(
+                  (data) => data && { ...data, items: [model, ...data.items] },
+                )
+              }
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -443,40 +532,42 @@ export default function Models() {
                       <Tooltip
                         hasArrow
                         placement="top"
-                        label={(r.timestamp ?? new Date()).toLocaleString()}
+                        label={new Date(r.timestamp).toLocaleString()}
                       >
-                        {(r.timestamp ?? new Date()).toLocaleDateString()}
+                        {new Date(r.timestamp).toLocaleDateString()}
                       </Tooltip>
                     </Td>
                     <Td>{r.modelName}</Td>
                     <Td>{r.type.typeName ?? ''}</Td>
                     <Td>
                       <Flex>
-                        <Button
-                          marginEnd="2"
-                          background="green.300"
-                          _hover={{ background: 'green.400' }}
-                        >
-                          <CLink href={r.modelFilePath}>
+                        <CLink href={API_URL + '/model/download/' + r.modelId}>
+                          <Button
+                            marginEnd="2"
+                            background="green.300"
+                            _hover={{ background: 'green.400' }}
+                          >
                             <FontAwesomeIcon icon={faDownload} />
-                          </CLink>
-                        </Button>
-                        <Button
-                          background="red.300"
-                          _hover={{ background: 'red.400' }}
-                          onClick={() => {
-                            if (confirmDelete == idx) {
-                              deleteModel(data.items[idx]);
-                            } else {
-                              setConfirmDelete(idx);
-                            }
-                          }}
-                          onBlur={() => setConfirmDelete(-1)}
-                        >
-                          <FontAwesomeIcon
-                            icon={confirmDelete == idx ? faCheck : faTrash}
-                          />
-                        </Button>
+                          </Button>
+                        </CLink>
+                        {userStore.user?.isAdmin && (
+                          <Button
+                            background="red.300"
+                            _hover={{ background: 'red.400' }}
+                            onClick={() => {
+                              if (confirmDelete == idx) {
+                                deleteModel(data.items[idx]);
+                              } else {
+                                setConfirmDelete(idx);
+                              }
+                            }}
+                            onBlur={() => setConfirmDelete(-1)}
+                          >
+                            <FontAwesomeIcon
+                              icon={confirmDelete == idx ? faCheck : faTrash}
+                            />
+                          </Button>
+                        )}
                       </Flex>
                     </Td>
                   </Tr>

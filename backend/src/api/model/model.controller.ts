@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AdminGuard } from 'src/auth/admin.guard';
+import { UserGuard } from 'src/auth/user.guard';
 import { BaseResult, Pagination } from 'src/dtos/base-result.dto';
 import {
   ListModelParams,
@@ -143,9 +144,9 @@ export class ModelController {
   })
   @Get('download/:modelId')
   async download(@Res() res: Response, @Param('modelId') modelId: string) {
-    const result = await this.modelService.downloadModel(modelId);
-    res.attachment(modelId);
-    res.send(result);
+    const [name, data] = await this.modelService.downloadModel(modelId);
+    res.attachment(name);
+    res.send(data);
   }
 
   @ApiOkResponse({
@@ -160,6 +161,8 @@ export class ModelController {
       ],
     },
   })
+  @UseGuards(UserGuard)
+  @ApiBearerAuth('userAuth')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload')

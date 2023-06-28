@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as path from 'path';
 import { ListModelParams, ListModelTypeParams } from 'src/dtos/model.dto';
 import { Model, ModelType } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
@@ -85,12 +86,16 @@ export class ModelService {
     return await this.modelTypeRepo.remove(type);
   }
 
-  async downloadModel(modelId: string) {
+  async downloadModel(modelId: string): Promise<[string, Buffer]> {
     const model = await this.modelRepo.findOneBy({ modelId });
     if (!model) {
       throw new NotFoundException(`ModelId ${modelId} not found`);
     }
-    return await this.storageService.getModel(model.modelFilePath);
+
+    const name = model.modelName + path.extname(model.modelFilePath);
+    const data = await this.storageService.getModel(model.modelFilePath);
+
+    return [name, data];
   }
 
   async uploadModel(
