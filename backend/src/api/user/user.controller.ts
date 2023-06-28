@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Post,
   Put,
   Req,
@@ -32,6 +33,23 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
+
+  @ApiOkResponse({
+    schema: {
+      $ref: getSchemaPath(BaseResult),
+      properties: {
+        data: { $ref: getSchemaPath(User) },
+      },
+    },
+  })
+  @UseGuards(UserGuard)
+  @ApiBearerAuth('userAuth')
+  @Get('get')
+  async getInfo(@Req() req: Request, @Res() res: Response) {
+    const user: AuthUserPayload = req['user'];
+    const result = await this.userService.getUser(user.userId);
+    new BaseResult(result).toResponse(res);
+  }
 
   @ApiOkResponse({
     schema: {

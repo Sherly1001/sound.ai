@@ -10,6 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const cfg = app.get(ConfigService<AppConfig, true>);
 
+  app.enableCors();
+
   app.useGlobalFilters(new ResultWapper());
 
   const doc = new DocumentBuilder()

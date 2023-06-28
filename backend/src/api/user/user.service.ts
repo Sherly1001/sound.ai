@@ -10,6 +10,10 @@ export class UserService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
+  async getUser(userId: string) {
+    return await this.userRepo.findOneBy({ userId });
+  }
+
   async createUser(
     username: string,
     password: string,
