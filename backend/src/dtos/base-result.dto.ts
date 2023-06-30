@@ -59,14 +59,18 @@ export class Pagination<T> {
   @ApiProperty()
   hasPrev: boolean;
 
+  @ApiProperty()
+  totalPages: number;
+
   constructor(items: T[], total: number, limit: number, page: number) {
-    let totalPages = Math.floor(total / limit);
+    if (limit < 1) limit = 10;
+    this.totalPages = Math.ceil(total / limit);
 
     this.items = items;
     this.count = items.length;
     this.total = total;
     this.page = page > 0 ? +page : 1;
-    this.hasNext = page < totalPages;
+    this.hasNext = page < this.totalPages;
     this.hasPrev = page > 1;
   }
 }

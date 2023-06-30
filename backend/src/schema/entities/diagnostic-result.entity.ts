@@ -21,22 +21,37 @@ export class DiagnosticResult {
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => Record)
+  @ManyToOne(() => Record, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
   record: Record;
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => Model)
+  @ManyToOne(() => Model, {
+    nullable: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   model: Model;
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, {
+    nullable: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   diagnosticByUser: User;
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => Device, { nullable: true })
+  @ManyToOne(() => Device, {
+    nullable: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   diagnosticByDevice: Device;
 
   @ApiProperty({ type: [Score] })

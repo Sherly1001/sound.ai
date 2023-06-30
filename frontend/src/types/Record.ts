@@ -1,4 +1,4 @@
-import { Device } from '.';
+import { Device, OrderQuery, PageQuery, TimeQuery } from '.';
 import { Result } from './Result';
 
 export interface Record {
@@ -12,4 +12,10 @@ export interface Record {
   imageFilePath: string;
   location: string;
   results?: Result[];
+}
+
+export interface RecordQuery extends TimeQuery, PageQuery, OrderQuery {
+  deviceName?: string;
+  temperature?: string;
+  humidity?: string;
 }

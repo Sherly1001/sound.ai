@@ -52,7 +52,36 @@ export class RecordService {
 
     query.leftJoinAndSelect('Record.device', 'Device');
 
+    if (params.getResults && params.getResults == 'true') {
+      query.leftJoinAndSelect('Record.results', 'DiagnosticResult');
+      query.leftJoinAndSelect('DiagnosticResult.model', 'Model');
+      query.leftJoinAndSelect('DiagnosticResult.scores', 'Score');
+      query.leftJoinAndSelect('DiagnosticResult.diagnosticByUser', 'User');
+      query.leftJoinAndSelect(
+        'DiagnosticResult.diagnosticByDevice',
+        'ResultDevice',
+      );
+      query.leftJoinAndSelect('Model.type', 'ModelType');
+      query.leftJoinAndSelect('Score.label', 'Label');
+    }
+
     return await query.getManyAndCount();
+  }
+
+  async getRecord(recordId: string) {
+    const query = this.recordRepo
+      .createQueryBuilder()
+      .where('Record.recordId = :recordId', { recordId })
+      .leftJoinAndSelect('Record.device', 'Device')
+      .leftJoinAndSelect('Record.results', 'DiagnosticResult')
+      .leftJoinAndSelect('DiagnosticResult.model', 'Model')
+      .leftJoinAndSelect('DiagnosticResult.scores', 'Score')
+      .leftJoinAndSelect('DiagnosticResult.diagnosticByUser', 'User')
+      .leftJoinAndSelect('DiagnosticResult.diagnosticByDevice', 'ResultDevice')
+      .leftJoinAndSelect('Model.type', 'ModelType')
+      .leftJoinAndSelect('Score.label', 'Label');
+
+    return await query.getOne();
   }
 
   async uploadRecord(

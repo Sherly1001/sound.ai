@@ -47,6 +47,24 @@ export class RecordController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
+            data: { $ref: getSchemaPath(Record) },
+          },
+        },
+      ],
+    },
+  })
+  @Get('get/:recordId')
+  async get(@Res() res: Response, @Param('recordId') recordId: string) {
+    const result = await this.recordService.getRecord(recordId);
+    new BaseResult(result).toResponse(res);
+  }
+
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(BaseResult) },
+        {
+          properties: {
             data: {
               allOf: [
                 { $ref: getSchemaPath(Pagination) },

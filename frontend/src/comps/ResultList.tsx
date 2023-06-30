@@ -65,9 +65,9 @@ export default function ResultList({ record, truncateSize = 25 }: Props) {
               <Tooltip
                 hasArrow
                 placement="top"
-                label={(result?.timestamp ?? new Date()).toLocaleString()}
+                label={new Date(result?.timestamp ?? '').toLocaleString()}
               >
-                {(result?.timestamp ?? new Date()).toLocaleDateString()}
+                {new Date(result?.timestamp ?? '').toLocaleDateString()}
               </Tooltip>
             </Text>
           </Box>

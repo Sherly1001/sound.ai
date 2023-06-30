@@ -33,9 +33,10 @@ import Rounded from '../../comps/Rounded';
 import ReactWaveSurfer from '../../comps/WaveSurfer';
 import { Model, Record } from '../../types';
 import { Result } from '../../types/Result';
-import { BLUE_MARKER } from '../../utils/const';
+import { API_URL, BLUE_MARKER } from '../../utils/const';
 import { fakeModels, fakeRecord, fakeResult } from '../../utils/faker';
 import { locationToLatLng } from '../../utils/funcs';
+import { recordService } from '../../services';
 
 type Option = {
   value: string;
@@ -108,9 +109,9 @@ function RightPanel({ record }: { record?: Record }) {
         <Tooltip
           hasArrow
           placement="top"
-          label={(record?.timestamp ?? new Date()).toLocaleString()}
+          label={new Date(record?.timestamp ?? '').toLocaleString()}
         >
-          {(record?.timestamp ?? new Date()).toLocaleDateString()}
+          {new Date(record?.timestamp ?? '').toLocaleDateString()}
         </Tooltip>
       </Text>
       <Text marginBottom="2">Temperature: {record?.temperature ?? 0} °C</Text>
@@ -198,9 +199,9 @@ export default function RecordDetail() {
 
   const getData = useCallback(
     () =>
-      new Promise<Record>((res, _rej) =>
-        setTimeout(() => res(fakeRecord(params.id)), 200),
-      ),
+      params.id
+        ? recordService.get(params.id).then((res) => res.data)
+        : Promise.resolve(undefined),
     [params],
   );
 
@@ -232,7 +233,9 @@ export default function RecordDetail() {
                   <ReactWaveSurfer
                     options={{
                       height: 100,
-                      url: record?.audioFilePath,
+                      url:
+                        record?.audioFilePath &&
+                        API_URL + '/record/audio/' + record?.audioFilePath,
                       normalize: true,
                       progressColor: '#EC407A',
                       waveColor: '#D1D6DA',
@@ -265,7 +268,7 @@ export default function RecordDetail() {
                 >
                   <Popup>
                     <ImgZoom
-                      src={record.imageFilePath}
+                      src={API_URL + '/record/images/' + record.imageFilePath}
                       width="52"
                       zoomScale={4}
                       transitionTime={0.3}

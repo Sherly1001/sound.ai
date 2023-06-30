@@ -24,4 +24,7 @@ export class ListRecordParams extends QueryParamsDto {
 
   @ApiProperty({ required: false })
   humidity: string;
+
+  @ApiProperty({ type: 'boolean', required: false, default: false })
+  getResults: string;
 }

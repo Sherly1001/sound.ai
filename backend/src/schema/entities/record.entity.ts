@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Device } from './device.entity';
+import { DiagnosticResult } from './diagnostic-result.entity';
 
 @Entity()
 export class Record {
@@ -18,6 +20,11 @@ export class Record {
   @JoinColumn()
   @ManyToOne(() => Device)
   device: Device;
+
+  @ApiProperty({ type: () => [DiagnosticResult] })
+  @JoinColumn()
+  @OneToMany(() => DiagnosticResult, (result) => result.record)
+  results: DiagnosticResult[];
 
   @ApiProperty()
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

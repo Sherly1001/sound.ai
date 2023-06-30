@@ -20,7 +20,11 @@ export class Device {
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => Model)
+  @ManyToOne(() => Model, {
+    nullable: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   currentModel: Model;
 
   @ApiProperty()

@@ -33,15 +33,16 @@ import Loading from '../../comps/Loading';
 import PlayAudio from '../../comps/PlayAudio';
 import Rounded from '../../comps/Rounded';
 import { facCaretDown, facCaretNone, facCaretUp } from '../../custom-icons';
+import { recordService } from '../../services';
 import { Record } from '../../types';
 import { Pagination } from '../../types/Pagination';
-import { fakeRecords } from '../../utils/faker';
 import {
   dateString,
   genPageLinks,
   truncate,
   useQueries,
 } from '../../utils/funcs';
+import { API_URL } from '../../utils/const';
 
 export default function RecordList() {
   const [searchParams, setSearchParams] = useQueries();
@@ -115,19 +116,18 @@ export default function RecordList() {
     if (data) setPageLinks(genPageLinks(data.page, data.totalPages));
   }, [data]);
 
-  const getBefore = useCallback(() => dateString(filters.beforeAt), [filters]);
-
-  const getAfter = useCallback(() => dateString(filters.afterAt), [filters]);
-
   const getData = useCallback(
     () =>
-      fakeRecords({
-        limit,
-        page,
-        orderBy,
-        orderAsc: orderAsc == 'asc',
-        filters,
-      }),
+      recordService
+        .list({
+          limit,
+          page,
+          orderBy,
+          orderASC: orderAsc == 'asc',
+          ...filters,
+        })
+        .then((res) => res.data ?? null)
+        .catch((err) => (console.debug(err), null)),
     [limit, page, orderBy, orderAsc, filters],
   );
 
@@ -155,7 +155,7 @@ export default function RecordList() {
               After
             </Text>
             <Input
-              value={getAfter() ?? ''}
+              value={dateString(filters.afterAt) ?? ''}
               onChange={(e) =>
                 setFilters((filters) => ({
                   ...filters,
@@ -172,7 +172,7 @@ export default function RecordList() {
               Before
             </Text>
             <Input
-              value={getBefore() ?? ''}
+              value={dateString(filters.beforeAt) ?? ''}
               onChange={(e) =>
                 setFilters((filters) => ({
                   ...filters,
@@ -343,9 +343,9 @@ export default function RecordList() {
                       <Tooltip
                         hasArrow
                         placement="top"
-                        label={(r.timestamp ?? new Date()).toLocaleString()}
+                        label={new Date(r.timestamp).toLocaleString()}
                       >
-                        {(r.timestamp ?? new Date()).toLocaleDateString()}
+                        {new Date(r.timestamp).toLocaleDateString()}
                       </Tooltip>
                     </Td>
                     <Td>
@@ -361,7 +361,9 @@ export default function RecordList() {
                     <Td>{r.temperature ?? 0} °C</Td>
                     <Td>{r.humidity ?? 0} %</Td>
                     <Td>
-                      <PlayAudio src={r.audioFilePath} />
+                      <PlayAudio
+                        src={API_URL + '/record/audio/' + r.audioFilePath}
+                      />
                     </Td>
                   </Tr>
                 ))}
