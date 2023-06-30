@@ -291,7 +291,7 @@ export default function Models() {
         const toastId = toast({
           position: 'top-right',
           status: 'info',
-          description: 'Uploading new model',
+          description: 'Deleting model',
         });
 
         modelService.remove(model.modelId).then((res) => {
