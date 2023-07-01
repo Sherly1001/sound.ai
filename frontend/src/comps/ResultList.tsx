@@ -14,7 +14,7 @@ import {
   Tooltip,
   Tr,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from '../comps/Link';
 import { routes } from '../routers';
 import { Record } from '../types';
@@ -27,6 +27,11 @@ export interface Props {
 
 export default function ResultList({ record, truncateSize = 25 }: Props) {
   const [currentResult, setCurrentResult] = useState(0);
+
+  useEffect(() => {
+    setCurrentResult(0);
+  }, [record]);
+
   return record?.results && record?.results.length > 0 ? (
     <Flex height="100%" flexDirection="column">
       <Tooltip

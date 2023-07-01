@@ -64,6 +64,7 @@ export class RecordService {
       query.leftJoinAndSelect('Model.type', 'ModelType');
       query.leftJoinAndSelect('Score.label', 'Label');
       query.addOrderBy('DiagnosticResult.timestamp', 'DESC');
+      query.addOrderBy('Label.labelName', 'ASC');
     }
 
     return await query.getManyAndCount();
@@ -81,7 +82,8 @@ export class RecordService {
       .leftJoinAndSelect('DiagnosticResult.diagnosticByDevice', 'ResultDevice')
       .leftJoinAndSelect('Model.type', 'ModelType')
       .leftJoinAndSelect('Score.label', 'Label')
-      .addOrderBy('DiagnosticResult.timestamp', 'DESC');
+      .addOrderBy('DiagnosticResult.timestamp', 'DESC')
+      .addOrderBy('Label.labelName', 'ASC');
 
     return await query.getOne();
   }

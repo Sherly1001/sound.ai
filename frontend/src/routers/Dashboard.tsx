@@ -110,6 +110,11 @@ export default function Dashboard() {
                 bounds={getBounds(
                   statistic.records.map((dt) => locationToLatLng(dt.location)),
                 )}
+                center={
+                  statistic.records[0]?.location
+                    ? locationToLatLng(statistic.records[0]?.location)
+                    : undefined
+                }
               >
                 {statistic.records.map((dt, idx) => (
                   <Marker

@@ -21,11 +21,19 @@ export class DashboardService {
     const prev = new Date();
     prev.setDate(now.getDate() - 30);
 
+    const subQuery = this.recordRepo
+      .createQueryBuilder()
+      .select('Record.recordId')
+      .andWhere('Record.timestamp <= :now::timestamptz')
+      .andWhere('Record.timestamp >= :prev::timestamptz')
+      .orderBy('Record.timestamp', 'DESC')
+      .take(10)
+      .getQuery();
+
     const [records, newRecords] = await this.recordRepo
       .createQueryBuilder()
       .setParameters({ now, prev })
-      .andWhere('Record.timestamp <= :now::timestamptz')
-      .andWhere('Record.timestamp >= :prev::timestamptz')
+      .andWhere(`Record.recordId in (${subQuery})`)
       .leftJoinAndSelect('Record.device', 'Device')
       .leftJoinAndSelect('Record.results', 'DiagnosticResult')
       .leftJoinAndSelect('DiagnosticResult.model', 'Model')
@@ -36,7 +44,7 @@ export class DashboardService {
       .leftJoinAndSelect('Score.label', 'Label')
       .orderBy('Record.timestamp', 'DESC')
       .addOrderBy('DiagnosticResult.timestamp', 'DESC')
-      .take(10)
+      .addOrderBy('Label.labelName', 'ASC')
       .getManyAndCount();
 
     const res = (await this.scoreRepo

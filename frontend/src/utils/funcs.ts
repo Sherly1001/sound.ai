@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 
 export function getBounds(positions: LatLng[]) {
-  if (positions.length < 1) return;
+  if (positions.length < 2) return;
 
   return positions.slice(1).reduce((acc, i) => {
     acc.extend(i);

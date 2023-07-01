@@ -218,6 +218,7 @@ export class ResultService {
       .createQueryBuilder()
       .leftJoinAndSelect('Score.label', 'Label')
       .where('Score.result = :resultId', { resultId: res.resultId })
+      .addOrderBy('Label.labelName', 'ASC')
       .getMany();
     res.scores = sc;
 
