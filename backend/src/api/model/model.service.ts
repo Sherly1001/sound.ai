@@ -45,7 +45,7 @@ export class ModelService {
 
     if (params.orderBy) {
       const asc = params.orderASC ? params.orderASC == 'true' : true;
-      query.orderBy('Model.' + params.orderBy, asc ? 'ASC' : 'DESC');
+      query.orderBy(params.orderBy, asc ? 'ASC' : 'DESC');
     }
 
     query.leftJoinAndSelect('Model.type', 'ModelType');

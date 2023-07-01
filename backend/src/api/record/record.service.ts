@@ -47,7 +47,7 @@ export class RecordService {
 
     if (params.orderBy) {
       const asc = params.orderASC ? params.orderASC == 'true' : true;
-      query.orderBy('Record.' + params.orderBy, asc ? 'ASC' : 'DESC');
+      query.orderBy(params.orderBy, asc ? 'ASC' : 'DESC');
     }
 
     query.leftJoinAndSelect('Record.device', 'Device');

@@ -139,7 +139,7 @@ export default function Devices() {
   );
   const getPage = useCallback(() => Number(params.get('page')) || 1, [params]);
   const getOrderBy = useCallback(
-    () => params.get('orderBy') ?? 'timestamp',
+    () => params.get('orderBy') ?? 'time',
     [params],
   );
   const getOrderAsc = useCallback(() => {
@@ -217,10 +217,10 @@ export default function Devices() {
 
   const headers = [
     { name: '#' },
-    { name: 'id', order: 'deviceId' },
-    { name: 'created at', order: 'timestamp' },
-    { name: 'device name', order: 'deviceName' },
-    { name: 'current model', order: 'currentModel' },
+    { name: 'id', order: 'id' },
+    { name: 'created at', order: 'time' },
+    { name: 'device name', order: 'name' },
+    { name: 'current model', order: 'model' },
   ];
 
   const Filters = useCallback(({ filters }: { filters: FiltersType }) => {

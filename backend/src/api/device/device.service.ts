@@ -45,7 +45,7 @@ export class DeviceService {
 
     if (params.orderBy) {
       const asc = params.orderASC ? params.orderASC == 'true' : true;
-      query.orderBy('Device.' + params.orderBy, asc ? 'ASC' : 'DESC');
+      query.orderBy(params.orderBy, asc ? 'ASC' : 'DESC');
     }
 
     query.leftJoinAndSelect('Device.currentModel', 'Model');

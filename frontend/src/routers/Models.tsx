@@ -205,7 +205,7 @@ export default function Models() {
   );
   const getPage = useCallback(() => Number(params.get('page')) || 1, [params]);
   const getOrderBy = useCallback(
-    () => params.get('orderBy') ?? 'timestamp',
+    () => params.get('orderBy') ?? 'time',
     [params],
   );
   const getOrderAsc = useCallback(() => {
@@ -323,7 +323,7 @@ export default function Models() {
   const headers = [
     { name: '#' },
     { name: 'id', order: 'id' },
-    { name: 'uploaded at', order: 'timestamp' },
+    { name: 'uploaded at', order: 'time' },
     { name: 'name', order: 'name' },
     { name: 'type', order: 'type' },
     { name: '' },

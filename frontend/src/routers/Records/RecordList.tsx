@@ -56,7 +56,7 @@ export default function RecordList() {
     [searchParams],
   );
   const getOrderBy = useCallback(
-    () => searchParams.get('orderBy') ?? 'timestamp',
+    () => searchParams.get('orderBy') ?? 'time',
     [searchParams],
   );
   const getOrderAsc = useCallback(() => {
@@ -134,7 +134,7 @@ export default function RecordList() {
   const headers = [
     { name: '#' },
     { name: 'id', order: 'id' },
-    { name: 'uploaded at', order: 'timestamp' },
+    { name: 'uploaded at', order: 'time' },
     { name: 'by device', order: 'device' },
     { name: 'temperature', order: 'temperature' },
     { name: 'humidity', order: 'humidity' },

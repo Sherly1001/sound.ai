@@ -4,6 +4,26 @@ import { axiosInstance } from './axios';
 
 export namespace modelService {
   export async function list(query: ModelQuery) {
+    if (query.orderBy) {
+      switch (query.orderBy) {
+        case 'id':
+          query.orderBy = 'Model.modelId';
+          break;
+        case 'time':
+          query.orderBy = 'Model.timestamp';
+          break;
+        case 'name':
+          query.orderBy = 'Model.modelName';
+          break;
+        case 'type':
+          query.orderBy = 'ModelType.typeName';
+          break;
+        default:
+          query.orderBy = 'Model.timestamp';
+          query.orderASC = false;
+      }
+    }
+
     return axiosInstance
       .get('/model/list', { params: query })
       .catch((err) => {
