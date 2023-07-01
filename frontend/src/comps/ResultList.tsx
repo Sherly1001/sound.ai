@@ -71,11 +71,15 @@ export default function ResultList({ record, truncateSize = 25 }: Props) {
             <Text>
               Diagnostic with model:{' '}
               <Link
+                disable={!result?.model?.modelName}
                 to={routes.home.models}
                 params={{ id: result?.model?.modelId }}
               >
-                <Text as="span" color="messenger.400">
-                  {result?.model?.modelName}
+                <Text
+                  as="span"
+                  color={result?.model ? 'messenger.400' : 'gray.400'}
+                >
+                  {result?.model?.modelName ?? 'deleted'}
                 </Text>
               </Link>
             </Text>

@@ -1,4 +1,10 @@
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   Link as CLink,
@@ -25,7 +31,6 @@ import {
 import {
   faCaretLeft,
   faCaretRight,
-  faCheck,
   faDownload,
   faFileUpload,
   faFilterCircleXmark,
@@ -223,7 +228,10 @@ export default function Models() {
   const [filterOpen, setFilterOpen] = useState(false);
 
   const [newOpen, setNewOpen] = useState(false);
+
   const [confirmDelete, setConfirmDelete] = useState(-1);
+  const cancelRef = useRef(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   type FiltersType = {
     beforeAt?: Date;
@@ -283,9 +291,9 @@ export default function Models() {
   );
 
   const deleteModel = useCallback(
-    (model: Model) => {
-      console.log('delete', model);
+    (model?: Model) => {
       setConfirmDelete(-1);
+      if (!model) return;
 
       if (userStore.user?.isAdmin) {
         const toastId = toast({
@@ -295,6 +303,7 @@ export default function Models() {
         });
 
         modelService.remove(model.modelId).then((res) => {
+          setDeleteOpen(false);
           if (res.data) {
             toast.update(toastId, {
               status: 'success',
@@ -317,7 +326,7 @@ export default function Models() {
         });
       }
     },
-    [setConfirmDelete, userStore],
+    [confirmDelete, userStore],
   );
 
   const headers = [
@@ -555,17 +564,11 @@ export default function Models() {
                             background="red.300"
                             _hover={{ background: 'red.400' }}
                             onClick={() => {
-                              if (confirmDelete == idx) {
-                                deleteModel(data.items[idx]);
-                              } else {
-                                setConfirmDelete(idx);
-                              }
+                              setConfirmDelete(idx);
+                              setDeleteOpen(true);
                             }}
-                            onBlur={() => setConfirmDelete(-1)}
                           >
-                            <FontAwesomeIcon
-                              icon={confirmDelete == idx ? faCheck : faTrash}
-                            />
+                            <FontAwesomeIcon icon={faTrash} />
                           </Button>
                         )}
                       </Flex>
@@ -656,6 +659,36 @@ export default function Models() {
           rows
         </Flex>
       </Flex>
+      <AlertDialog
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        leastDestructiveRef={cancelRef}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete model: {data?.items[confirmDelete]?.modelName}
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure? You can't undo this action afterwards.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setDeleteOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => deleteModel(data?.items[confirmDelete])}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 }
