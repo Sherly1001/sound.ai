@@ -4,8 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PartialUser } from 'src/dtos/user.dto';
+import { ListUserParams, PartialUser } from 'src/dtos/user.dto';
 import { User } from 'src/schema/entities';
+import { sqlContains } from 'src/utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -16,6 +17,33 @@ export class UserService {
 
   async getUser(userId: string) {
     return await this.userRepo.findOneBy({ userId });
+  }
+
+  async getUsers(params: ListUserParams) {
+    const query = this.userRepo.createQueryBuilder().setParameters(params);
+
+    if (params.username) {
+      sqlContains(query, 'User.username', 'username');
+    }
+
+    if (typeof params.isAdmin != 'undefined') {
+      query.andWhere('User.isAdmin = :isAdmin');
+    }
+
+    if (params.page > 0) {
+      query.skip(params.limit * (params.page - 1));
+    }
+
+    if (params.limit) {
+      query.take(params.limit);
+    }
+
+    if (params.orderBy) {
+      const asc = params.orderASC ? params.orderASC == 'true' : true;
+      query.orderBy('User.' + params.orderBy, asc ? 'ASC' : 'DESC');
+    }
+
+    return await query.getManyAndCount();
   }
 
   async createUser(

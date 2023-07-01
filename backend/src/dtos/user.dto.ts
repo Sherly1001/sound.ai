@@ -1,5 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { User } from 'src/schema/entities/user.entity';
+import { QueryParamsDto } from './query-params.dto';
 
 export class UserDto {
   @ApiProperty()
@@ -24,4 +25,15 @@ export class UserUpdateDto extends PartialType(UserDto) {
 export class PartialUser extends PartialType(User) {
   @ApiProperty()
   currentPassword: string;
+}
+
+export class ListUserParams extends OmitType(QueryParamsDto, [
+  'beforeAt',
+  'afterAt',
+]) {
+  @ApiProperty({ required: false })
+  username: string;
+
+  @ApiProperty({ type: 'boolean', required: false })
+  isAdmin: string;
 }
