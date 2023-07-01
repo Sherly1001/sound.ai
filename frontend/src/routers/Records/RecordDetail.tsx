@@ -16,6 +16,7 @@ import {
   Thead,
   Tooltip,
   Tr,
+  useToast,
 } from '@chakra-ui/react';
 import { Select } from 'chakra-react-select';
 import { Marker as LMarker } from 'leaflet';
@@ -31,11 +32,10 @@ import Map from '../../comps/Map';
 import ResultList from '../../comps/ResultList';
 import Rounded from '../../comps/Rounded';
 import ReactWaveSurfer from '../../comps/WaveSurfer';
-import { recordService } from '../../services';
+import { modelService, recordService } from '../../services';
 import { Model, Record } from '../../types';
 import { Result } from '../../types/Result';
 import { API_URL, BLUE_MARKER } from '../../utils/const';
-import { fakeModels, fakeResult } from '../../utils/faker';
 import { locationToLatLng } from '../../utils/funcs';
 
 type Option = {
@@ -51,10 +51,19 @@ function RightPanel({ record }: { record?: Record }) {
   const [startDianostic, setStartDianostic] = useState(false);
   const [diagnosticResult, setDiagnosticResult] = useState<Result>();
 
+  const toast = useToast();
+
   useEffect(() => {
-    fakeModels({ filters: { name: searchFilter } }).then((data) => {
-      setModels(data.items);
-    });
+    modelService
+      .list({ modelName: searchFilter, orderBy: 'name' })
+      .then((res) => {
+        if (res.data) {
+          setModels(res.data.items);
+        } else {
+          console.debug(res.error);
+        }
+      })
+      .catch(console.debug);
   }, [searchFilter]);
 
   const options = useMemo(
@@ -69,16 +78,26 @@ function RightPanel({ record }: { record?: Record }) {
     [models],
   );
 
-  const diagnostic = useCallback(() => {
-    if (!startDianostic || !model) {
-      return Promise.resolve(undefined);
+  const diagnostic = useCallback(async () => {
+    if (!startDianostic || !model || !record) {
+      return undefined;
     }
 
-    const result = fakeResult(undefined, record, model.value);
+    return await recordService
+      .diagnostic(record.recordId, model.value)
+      .then((res) => {
+        if (res.data) {
+          record.results = [res.data, ...(record.results ?? [])];
+          return res.data;
+        }
 
-    return new Promise<Result | undefined>((res, _rej) => {
-      setTimeout(() => res(result), 200);
-    });
+        toast({
+          position: 'top-right',
+          status: 'error',
+          description: res.error?.toString(),
+        });
+      })
+      .catch((err) => (console.debug(err), undefined));
   }, [model, record, startDianostic]);
 
   const setData = useCallback(
@@ -149,7 +168,7 @@ function RightPanel({ record }: { record?: Record }) {
                 }}
                 value={model}
                 onChange={(val) => setModel(val)}
-                onInputChange={(val) => setSearchFilter(val)}
+                onInputChange={(val) => setSearchFilter(val ? val : undefined)}
                 options={options}
               />
               <Button

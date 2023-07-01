@@ -8,7 +8,7 @@ import { facDeepLearning } from '../custom-icons';
 
 import { Box, Grid, HStack, Text, VStack } from '@chakra-ui/react';
 import { Marker as LMarker } from 'leaflet';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import { routes } from '.';
 import ImgZoom from '../comps/ImgZoom';
@@ -17,12 +17,10 @@ import Loading from '../comps/Loading';
 import Map from '../comps/Map';
 import RecordInfo from '../comps/RecordInfo';
 import Rounded from '../comps/Rounded';
-import { Record, StatisticDto } from '../types';
-import { Pagination } from '../types/Pagination';
-import { API_URL, BLUE_MARKER, RED_MARKER } from '../utils/const';
-import { fakeRecords } from '../utils/faker';
-import { getBounds, locationToLatLng } from '../utils/funcs';
 import { dashboardService } from '../services';
+import { StatisticDto } from '../types';
+import { API_URL, BLUE_MARKER, RED_MARKER } from '../utils/const';
+import { getBounds, locationToLatLng } from '../utils/funcs';
 
 const stas = ([newRecords, numDevices, numModels, percentOk]: number[]) => [
   {

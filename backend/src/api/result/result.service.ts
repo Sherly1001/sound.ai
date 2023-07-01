@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ListLabelParams,
@@ -165,6 +165,15 @@ export class ResultService {
   ) {
     const record = await this.recordRepo.findOneBy({ recordId });
     const model = await this.modelRepo.findOneBy({ modelId });
+
+    if (!record) {
+      throw new NotFoundException('Record not found.');
+    }
+
+    if (!model) {
+      throw new NotFoundException('Model not found.');
+    }
+
     const diagnosticByUser = byUserId
       ? await this.userRepo.findOneBy({
           userId: byUserId,

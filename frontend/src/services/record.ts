@@ -1,4 +1,5 @@
-import { BaseResult, Pagination, Record, RecordQuery } from '../types';
+import { BaseResult, Pagination, Record, RecordQuery, Result } from '../types';
+import { storageGetItem } from '../utils/funcs';
 import { axiosInstance } from './axios';
 
 export namespace recordService {
@@ -43,5 +44,19 @@ export namespace recordService {
         throw err;
       })
       .then((res) => res.data as BaseResult<Pagination<Record>>);
+  }
+
+  export async function diagnostic(recordId: string, modelId: string) {
+    return axiosInstance
+      .post('/result/diagnostic/' + recordId + '/' + modelId, null, {
+        headers: {
+          Authorization: 'Bearer ' + storageGetItem('token'),
+        },
+      })
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
+      .then((res) => res.data as BaseResult<Result>);
   }
 }

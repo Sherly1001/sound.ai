@@ -35,6 +35,7 @@ export class DashboardService {
       .leftJoinAndSelect('Model.type', 'ModelType')
       .leftJoinAndSelect('Score.label', 'Label')
       .orderBy('Record.timestamp', 'DESC')
+      .addOrderBy('DiagnosticResult.timestamp', 'DESC')
       .take(10)
       .getManyAndCount();
 

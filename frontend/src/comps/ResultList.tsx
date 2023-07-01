@@ -50,6 +50,20 @@ export default function ResultList({ record, truncateSize = 25 }: Props) {
         <>
           <Box paddingX="4" fontSize="sm" textAlign="center" color="gray.600">
             <Text>
+              Diagnostic by {result?.diagnosticByUser ? 'user' : 'device'}:{' '}
+              <Link
+                disable={!!result?.diagnosticByUser}
+                to={routes.home.devices}
+                params={{ id: result?.diagnosticByDevice?.deviceId }}
+              >
+                <Text as="span" color="messenger.400">
+                  {result?.diagnosticByUser
+                    ? result?.diagnosticByUser?.username
+                    : result?.diagnosticByDevice?.deviceName}
+                </Text>
+              </Link>
+            </Text>
+            <Text>
               Diagnostic with model:{' '}
               <Link
                 to={routes.home.models}

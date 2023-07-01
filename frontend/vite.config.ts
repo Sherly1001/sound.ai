@@ -30,7 +30,6 @@ export default defineConfig({
           chart: ['mathjs', 'chart.js', 'react-chartjs-2'],
           leaflet: ['leaflet', 'react-leaflet'],
           wave: ['wavesurfer.js'],
-          faker: ['@faker-js/faker'],
         },
       },
     },
