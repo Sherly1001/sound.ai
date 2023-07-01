@@ -18,6 +18,7 @@ import { Record } from '../types';
 import { truncate } from '../utils/funcs';
 import ResultList from './ResultList';
 import ReactWaveSurfer from './WaveSurfer';
+import { API_URL } from '../utils/const';
 
 export interface Props {
   record?: Record;
@@ -39,7 +40,9 @@ export default function RecordInfo({ record }: Props) {
       <Box paddingTop="4">
         <ReactWaveSurfer
           options={{
-            url: record?.audioFilePath,
+            url:
+              record?.audioFilePath &&
+              API_URL + '/record/audio/' + record.audioFilePath,
             normalize: true,
             progressColor: '#EC407A',
             waveColor: '#D1D6DA',
@@ -85,9 +88,9 @@ export default function RecordInfo({ record }: Props) {
                   <Tooltip
                     hasArrow
                     placement="top"
-                    label={(record?.timestamp ?? new Date()).toLocaleString()}
+                    label={new Date(record?.timestamp).toLocaleString()}
                   >
-                    {(record?.timestamp ?? new Date()).toLocaleDateString()}
+                    {new Date(record?.timestamp).toLocaleDateString()}
                   </Tooltip>
                 </Text>
                 <Text marginBottom="2">

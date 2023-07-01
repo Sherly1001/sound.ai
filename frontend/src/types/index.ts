@@ -5,4 +5,5 @@ export * from './Record';
 export * from './Response';
 export * from './Result';
 export * from './Score';
+export * from './Statistic';
 export * from './User';

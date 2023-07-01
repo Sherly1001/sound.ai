@@ -31,12 +31,12 @@ import Map from '../../comps/Map';
 import ResultList from '../../comps/ResultList';
 import Rounded from '../../comps/Rounded';
 import ReactWaveSurfer from '../../comps/WaveSurfer';
+import { recordService } from '../../services';
 import { Model, Record } from '../../types';
 import { Result } from '../../types/Result';
 import { API_URL, BLUE_MARKER } from '../../utils/const';
-import { fakeModels, fakeRecord, fakeResult } from '../../utils/faker';
+import { fakeModels, fakeResult } from '../../utils/faker';
 import { locationToLatLng } from '../../utils/funcs';
-import { recordService } from '../../services';
 
 type Option = {
   value: string;

@@ -6,14 +6,20 @@ export namespace userService {
   export async function login(username: string, password: string) {
     return axiosInstance
       .post('user/login', { username, password })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<string>);
   }
 
   export async function register(username: string, password: string) {
     return axiosInstance
       .post('user/create', { username, password })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<User>);
   }
 
@@ -24,7 +30,10 @@ export namespace userService {
           Authorization: 'Bearer ' + storageGetItem('token'),
         },
       })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<User>);
   }
 
@@ -43,7 +52,10 @@ export namespace userService {
           },
         },
       )
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<User>);
   }
 
@@ -54,7 +66,10 @@ export namespace userService {
           Authorization: 'Bearer ' + storageGetItem('token'),
         },
       })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<User>);
   }
 }

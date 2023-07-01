@@ -15,7 +15,10 @@ export namespace deviceService {
   export async function create(deviceName: string, password: string) {
     return axiosInstance
       .post('/device/create', { deviceName, password })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<Device>);
   }
 }

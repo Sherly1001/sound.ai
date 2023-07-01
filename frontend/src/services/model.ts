@@ -35,7 +35,10 @@ export namespace modelService {
           Authorization: 'Bearer ' + storageGetItem('token'),
         },
       })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<Model>);
   }
 
@@ -46,7 +49,10 @@ export namespace modelService {
           Authorization: 'Bearer ' + storageGetItem('token'),
         },
       })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<ModelType>);
   }
 
@@ -57,7 +63,10 @@ export namespace modelService {
           Authorization: 'Bearer ' + storageGetItem('token'),
         },
       })
-      .catch((err) => err.response)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
       .then((res) => res.data as BaseResult<ModelType>);
   }
 }

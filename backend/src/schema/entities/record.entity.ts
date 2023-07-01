@@ -18,7 +18,11 @@ export class Record {
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => Device)
+  @ManyToOne(() => Device, {
+    nullable: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   device: Device;
 
   @ApiProperty({ type: () => [DiagnosticResult] })

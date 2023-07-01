@@ -8,6 +8,6 @@ export class Label {
   labelId: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ unique: true })
   labelName: string;
 }

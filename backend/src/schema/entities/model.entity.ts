@@ -17,7 +17,10 @@ export class Model {
 
   @ApiProperty()
   @JoinColumn()
-  @ManyToOne(() => ModelType)
+  @ManyToOne(() => ModelType, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
   type: ModelType;
 
   @ApiProperty()
