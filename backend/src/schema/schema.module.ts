@@ -18,6 +18,7 @@ import migrations from './migrations';
         migrations: migrations,
         synchronize: cfg.get('database.enableSync', { infer: true }),
         migrationsRun: cfg.get('database.runMigrations', { infer: true }),
+        ssl: cfg.get('database.ssl', { infer: true }),
       }),
     }),
   ],

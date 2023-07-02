@@ -5,6 +5,7 @@ export class AppConfig {
     log: boolean;
     enableSync: boolean;
     runMigrations: boolean;
+    ssl: boolean;
   };
   jwt: {
     secret: string;
@@ -23,6 +24,7 @@ function config(): AppConfig {
       log: process.env.DATABASE_LOG == 'true',
       enableSync: process.env.DATABASE_SYNC == 'true',
       runMigrations: process.env.DATABASE_RUN_MIGRATIONS == 'true',
+      ssl: !(process.env.DATABASE_SSL == 'false'),
     },
     jwt: {
       secret: process.env.JWT_SECRET_KEY || '',
