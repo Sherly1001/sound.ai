@@ -293,6 +293,7 @@ export default function Models() {
   const deleteModel = useCallback(
     (model?: Model) => {
       setConfirmDelete(-1);
+      setDeleteOpen(false);
       if (!model) return;
 
       if (userStore.user?.isAdmin) {
