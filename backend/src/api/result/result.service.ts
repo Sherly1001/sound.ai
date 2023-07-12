@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ListLabelParams,
   ListResultParams,
   UploadScoreDto,
 } from 'src/dtos/score.dto';
+import { MqttService } from 'src/mqtt/mqtt.service';
 import {
   Device,
   DiagnosticResult,
@@ -16,10 +21,13 @@ import {
 } from 'src/schema/entities';
 import { sqlContains, sqlNumberRange } from 'src/utils';
 import { DataSource, Repository } from 'typeorm';
+import { RecordService } from '../record/record.service';
 
 @Injectable()
 export class ResultService {
   constructor(
+    private readonly mqttService: MqttService,
+    private readonly recordService: RecordService,
     private readonly dataSource: DataSource,
     @InjectRepository(DiagnosticResult)
     private readonly resultRepo: Repository<DiagnosticResult>,
@@ -141,16 +149,27 @@ export class ResultService {
     byUserId: string = null,
     byDeviceId: string = null,
   ) {
-    // TODO: get results from AI module
-    const [lables, _] = await this.getLabels({} as any);
-    const scores: UploadScoreDto[] = lables.map((l) => ({
-      labelId: l.labelId,
-      score: Math.random(),
-    }));
+    const record = await this.recordService.getRecord(recordId);
+    const fft = await this.recordService.getFft(recordId);
+
+    if (!record) {
+      throw new NotFoundException('Record not found');
+    }
+
+    const res = (await this.mqttService.publishAndWait('ai/predict/req', {
+      modelId,
+      record,
+      fft,
+    })) as any;
+
+    if (res.error) {
+      throw new InternalServerErrorException(res.error);
+    }
+
     return await this.uploadScores(
       recordId,
       modelId,
-      scores,
+      res.data,
       byUserId,
       byDeviceId,
     );

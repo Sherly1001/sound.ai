@@ -14,6 +14,11 @@ export class AppConfig {
   storage: {
     dir: string;
   };
+  mqtt: {
+    url: string;
+    username?: string;
+    password?: string;
+  };
 }
 
 function config(): AppConfig {
@@ -32,6 +37,11 @@ function config(): AppConfig {
     },
     storage: {
       dir: process.env.STORAGE_DIRECTORY || './data',
+    },
+    mqtt: {
+      url: process.env.MQTT_URL || '',
+      username: process.env.MQTT_USERNAME,
+      password: process.env.MQTT_PASSWORD,
     },
   };
 }

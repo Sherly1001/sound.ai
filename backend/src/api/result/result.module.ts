@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { DeviceGuard } from 'src/auth/dev.guard';
 import { UserGuard } from 'src/auth/user.guard';
+import { MqttModule } from 'src/mqtt/mqtt.module';
 import {
   Device,
   DiagnosticResult,
@@ -12,6 +13,7 @@ import {
   Score,
   User,
 } from 'src/schema/entities';
+import { RecordModule } from '../record/record.module';
 import { ResultController } from './result.controller';
 import { ResultService } from './result.service';
 
@@ -27,6 +29,8 @@ import { ResultService } from './result.service';
       Score,
       Label,
     ]),
+    MqttModule,
+    RecordModule,
   ],
   providers: [ResultService, UserGuard, DeviceGuard],
   controllers: [ResultController],

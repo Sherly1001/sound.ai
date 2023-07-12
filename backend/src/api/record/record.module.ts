@@ -13,6 +13,7 @@ import { RecordService } from './record.service';
     StorageModule,
   ],
   providers: [RecordService],
+  exports: [RecordService],
   controllers: [RecordController],
 })
 export class RecordModule {}
