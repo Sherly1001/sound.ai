@@ -6,23 +6,35 @@ import {
   LinearScale,
   PointElement,
 } from 'chart.js';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import { recordService } from '../services';
 import { fftToArr } from '../utils/funcs';
 
 Chart.register(LineElement, PointElement, CategoryScale, LinearScale);
 
 export interface Props {
-  fft?: string;
+  recordId?: string;
 }
 
-export default function Fft({ fft }: Props) {
-  const arr = useMemo(() => (fft ? fftToArr(fft) : undefined), [fft]);
+export default function Fft({ recordId }: Props) {
+  const [arr, setArr] = useState<number[]>([]);
+
+  useEffect(() => {
+    recordId &&
+      recordService
+        .getFft(recordId)
+        .then((res) => {
+          setArr(fftToArr(res.data ?? ''));
+        })
+        .catch(console.debug);
+  }, [recordId]);
 
   return (
     <Box>
       <Line
         options={{
+          animation: false,
           responsive: true,
           maintainAspectRatio: false,
           scales: {
@@ -33,6 +45,11 @@ export default function Fft({ fft }: Props) {
           plugins: {
             legend: {
               display: false,
+            },
+            decimation: {
+              enabled: true,
+              algorithm: 'lttb',
+              samples: 1000,
             },
           },
         }}

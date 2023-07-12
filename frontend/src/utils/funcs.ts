@@ -75,13 +75,17 @@ export function dateString(date?: Date) {
 }
 
 export function fftToArr(fft: string) {
-  return fft
+  const res = fft
     .split(',')
     .filter((s) => s)
     .map((s) => s.replace('j', 'i'))
     .map((s) => complex(s))
     .map((c) => abs(c))
     .map(Number);
+
+  let pad = res.length - 1;
+  while (res[pad] == 0) --pad;
+  return res.slice(0, pad + 1);
 }
 
 export function storageSetItem<T>(name: string, data: T) {

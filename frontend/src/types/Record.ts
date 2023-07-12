@@ -8,7 +8,7 @@ export interface Record {
   temperature: number;
   humidity: number;
   audioFilePath: string;
-  audioFft: string;
+  audioFft?: string;
   imageFilePath: string;
   location: string;
   results?: Result[];

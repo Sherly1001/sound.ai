@@ -47,7 +47,7 @@ export class Record {
   audioFilePath: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ select: false })
   audioFft: string;
 
   @ApiProperty()

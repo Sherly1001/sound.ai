@@ -264,7 +264,7 @@ export default function RecordDetail() {
                   />
                 </TabPanel>
                 <TabPanel padding={0}>
-                  <Fft fft={record?.audioFft} />
+                  <Fft recordId={record?.recordId} />
                 </TabPanel>
               </TabPanels>
             </Tabs>

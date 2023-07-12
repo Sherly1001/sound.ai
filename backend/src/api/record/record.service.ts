@@ -88,6 +88,16 @@ export class RecordService {
     return await query.getOne();
   }
 
+  async getFft(recordId: string) {
+    const res = await this.recordRepo
+      .createQueryBuilder()
+      .select('Record.audioFft')
+      .where('Record.recordId = :recordId', { recordId })
+      .getRawOne();
+
+    return res['Record_audioFft'];
+  }
+
   async uploadRecord(
     deviceId: string,
     audioFile: Express.Multer.File,

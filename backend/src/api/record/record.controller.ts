@@ -146,6 +146,28 @@ export class RecordController {
         { $ref: getSchemaPath(BaseResult) },
         {
           properties: {
+            data: { type: 'string' },
+          },
+        },
+      ],
+    },
+  })
+  @Get('ffts/:recordId')
+  async getFft(@Res() res: Response, @Param('recordId') recordId: string) {
+    try {
+      const result = await this.recordService.getFft(recordId);
+      new BaseResult(result).toResponse(res);
+    } catch (err) {
+      throw new NotFoundException();
+    }
+  }
+
+  @ApiOkResponse({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(BaseResult) },
+        {
+          properties: {
             data: { $ref: getSchemaPath(Record) },
           },
         },

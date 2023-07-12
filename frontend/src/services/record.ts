@@ -13,6 +13,16 @@ export namespace recordService {
       .then((res) => res.data as BaseResult<Record>);
   }
 
+  export async function getFft(recordId: string) {
+    return axiosInstance
+      .get("/record/ffts/" + recordId)
+      .catch((err) => {
+        if (err.response) return err.response;
+        throw err;
+      })
+      .then((res) => res.data as BaseResult<string>);
+  }
+
   export async function list(query: RecordQuery) {
     if (query.orderBy) {
       switch (query.orderBy) {
