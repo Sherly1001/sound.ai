@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as path from 'path';
 import { ListModelParams, ListModelTypeParams } from 'src/dtos/model.dto';
+import { MqttService } from 'src/mqtt/mqtt.service';
 import { Model, ModelType } from 'src/schema/entities';
 import { StorageService } from 'src/storage/storage.service';
 import { sqlContains } from 'src/utils';
@@ -10,6 +11,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class ModelService {
   constructor(
+    private readonly mqttService: MqttService,
     private readonly storageService: StorageService,
     @InjectRepository(Model) private readonly modelRepo: Repository<Model>,
     @InjectRepository(ModelType)
@@ -107,7 +109,15 @@ export class ModelService {
     try {
       const type = await this.modelTypeRepo.findOneBy({ typeId });
       const model = this.modelRepo.create({ modelName, type, modelFilePath });
-      return await this.modelRepo.save(model);
+      const res = await this.modelRepo.save(model);
+
+      if (res) {
+        this.mqttService.publish(MqttService.topicNewModel, {
+          modelId: res.modelId,
+        });
+      }
+
+      return res;
     } catch (err) {
       this.storageService.removeModel(modelFilePath);
       throw err;
@@ -118,7 +128,11 @@ export class ModelService {
     const model = await this.modelRepo.findOneBy({ modelId });
     if (model) {
       await this.storageService.removeModel(model.modelFilePath);
-      return await this.modelRepo.remove(model);
+      const res = await this.modelRepo.remove(model);
+
+      this.mqttService.publish(MqttService.topicRemoveModel, { modelId });
+
+      return res;
     }
     return null;
   }

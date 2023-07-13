@@ -10,9 +10,6 @@ mqtt = {
     'password': os.environ.get('MQTT_PASSWORD') or None,
 }
 
-labels = os.environ.get('NN_LABELS') or ''
-labels = labels.split(',')
-
-nn = {
-    'labels': labels,
+api = {
+    'url': os.environ.get('API_URL') or 'http://localhost:3000',
 }

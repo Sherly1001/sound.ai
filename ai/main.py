@@ -5,6 +5,7 @@ from paho.mqtt.client import Client, MQTTMessage
 
 import mqtt
 import nn
+import nn.load_model
 
 
 def on_predict_req(client: Client, _: Any, msg: MQTTMessage):
@@ -35,11 +36,36 @@ def on_predict_req(client: Client, _: Any, msg: MQTTMessage):
         }
 
     finally:
-        client.publish(mqtt.topic_res, json.dumps(response))
+        client.publish(mqtt.topic_predict_res, json.dumps(response))
+
+
+def on_new_model(client: Client, _: Any, msg: MQTTMessage):
+    try:
+        payload = json.loads(msg.payload)
+        if payload.get('modelId') is None:
+            raise Exception('missing field modelId')
+        print('downloading model:', payload['modelId'])
+        nn.load_model.download_model(payload['modelId'])
+        print('new model loaded:', payload['modelId'])
+    except Exception as err:
+        print('new model err:', err)
+
+
+def on_remove_model(client: Client, _: Any, msg: MQTTMessage):
+    try:
+        payload = json.loads(msg.payload)
+        if payload.get('modelId') is None:
+            raise Exception('missing field modelId')
+        nn.load_model.remove_model(payload['modelId'])
+    except Exception as err:
+        print('remove model err:', err)
 
 
 if __name__ == '__main__':
     client = mqtt.connect()
-    mqtt.sub(client, mqtt.topic_req, on_predict_req)
+
+    mqtt.sub(client, mqtt.topic_predict_req, on_predict_req)
+    mqtt.sub(client, mqtt.topic_new_model, on_new_model)
+    mqtt.sub(client, mqtt.topic_remove_model, on_remove_model)
 
     client.loop_forever()

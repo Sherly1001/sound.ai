@@ -156,11 +156,14 @@ export class ResultService {
       throw new NotFoundException('Record not found');
     }
 
-    const res = (await this.mqttService.publishAndWait('ai/predict/req', {
-      modelId,
-      record,
-      fft,
-    })) as any;
+    const res = (await this.mqttService.publishAndWait(
+      MqttService.topicPredictReq,
+      {
+        modelId,
+        record,
+        fft,
+      },
+    )) as any;
 
     if (res.error) {
       throw new InternalServerErrorException(res.error);

@@ -5,8 +5,10 @@ from typing import Any, Callable, Dict, List
 from paho.mqtt.client import (MQTT_ERR_CONN_LOST, MQTT_ERR_CONN_REFUSED,
                               MQTT_ERR_SUCCESS, Client, MQTTMessage, MQTTv5)
 
-topic_req = 'ai/predict/req'
-topic_res = 'ai/predict/res'
+topic_predict_req = 'ai/predict/req'
+topic_predict_res = 'ai/predict/res'
+topic_new_model = 'ai/new-model'
+topic_remove_model = 'ai/remove-model'
 
 Listener = Callable[[Client, Any, MQTTMessage], None]
 subs: Dict[str, List[Listener]] = {}

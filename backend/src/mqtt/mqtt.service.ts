@@ -11,6 +11,11 @@ import { Packet } from 'mqtt';
 
 @Injectable()
 export class MqttService {
+  static readonly topicPredictReq = 'ai/predict/req';
+  static readonly topicPredictRes = 'ai/predict/res';
+  static readonly topicNewModel = 'ai/new-model';
+  static readonly topicRemoveModel = 'ai/remove-model';
+
   private readonly logger = new Logger(MqttService.name);
 
   private readonly client: MqttClient;
@@ -25,7 +30,7 @@ export class MqttService {
 
     const topics = [
       {
-        name: 'ai/predict/res',
+        name: MqttService.topicPredictRes,
         handler: this.onRes.bind(this),
       },
     ];
@@ -63,13 +68,16 @@ export class MqttService {
   }
 
   publish(topic: string, payload: any) {
-    return this.client.publish(topic, JSON.stringify(payload));
+    const id = randomUUID();
+
+    payload.id = id;
+    this.client.publish(topic, JSON.stringify(payload));
+
+    return id;
   }
 
   publishAndWait(topic: string, payload: any) {
     return new Promise((res, rej) => {
-      payload.id = randomUUID();
-
       const timeout = setTimeout(() => {
         delete this.resolveList[payload.id];
         const err = new InternalServerErrorException('Message timeout');
@@ -77,8 +85,10 @@ export class MqttService {
         rej(err);
       }, this.timeout);
 
-      this.resolveList[payload.id] = [timeout, res];
-      this.publish(topic, payload);
+      const id = this.publish(topic, payload);
+      this.resolveList[id] = [timeout, res];
+
+      return id;
     });
   }
 }

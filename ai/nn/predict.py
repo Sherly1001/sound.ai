@@ -1,17 +1,36 @@
-from config import labels
+from typing import Any, List
 
-from typing import Any
-from random import random
+import os
+import json
+import urllib
+import urllib.request
+
+from config import api
+from .load_model import get_model
+
+api_labels_path = os.path.join(api['url'], 'result',
+                               'list-label?limit=100&orderASC=true')
+with urllib.request.urlopen(api_labels_path) as res:
+    res = json.loads(res.read())
+    if res.get('data') is not None:
+        labels: List[str] = list(
+            map(lambda l: l['labelId'], res['data']['items']))
+    else:
+        raise Exception(f'failed to load labels: {res["error"]}')
 
 
 def predict(model_id: str, record: Any, fft: str):
-    fftarr = list(map(complex, fft.split(',')))
-    # TODO: load model and predict
+    global labels
+
+    fftarr: List[complex] = list(map(complex, fft.split(',')))
+
+    model = get_model(model_id)
+    results = model(record, fftarr)
 
     scores = list(
-        map(lambda labelId: {
-            'labelId': labelId,
-            'score': random()
-        }, labels))
+        map(lambda r: {
+            'labelId': r[0],
+            'score': r[1]
+        }, zip(labels, results)))
 
     return scores
