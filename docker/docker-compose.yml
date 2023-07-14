@@ -13,18 +13,9 @@ services:
       POSTGRES_USER: noob
       POSTGRES_PASSWORD: noob
       POSTGRES_DB: noob
-  web:
-    image: web
-    build: ../backend
-    ports:
-      - "${PORT:-3000}:3000"
-    volumes:
-      - ./web-data:/app/data
-    environment:
-      - DATABASE_URL=postgres://noob:noob@sound-ai-database/noob
-      - "JWT_SECRET_KEY=${JWT_SECRET_KEY:-shernoob}"
   mqtt:
     image: emqx
+    container_name: sound-ai-mqtt
     restart: always
     ports:
       - 8083:8083
@@ -36,3 +27,46 @@ services:
       - ./mqtt-data/log:/opt/emqx/log
     environment:
       EMQX_HOST: 127.0.0.1
+  ai:
+    image: ai
+    container_name: sound-ai-ai
+    build: ../ai
+    depends_on:
+      - web
+    volumes:
+      - ./ai-data:/app/data
+    environment:
+      API_URL: http://sound-ai-web:3000
+      MQTT_HOST: sound-ai-mqtt
+      MQTT_USERNAME: noob
+      MQTT_PASSWORD: noob
+  web:
+    image: web
+    container_name: sound-ai-web
+    build: ../backend
+    depends_on:
+      - db
+      - mqtt
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ./web-data:/app/data
+    environment:
+      DATABASE_URL: postgres://noob:noob@sound-ai-database/noob
+      DATABASE_SSL: false
+      DATABASE_SYNC: true
+      DATABASE_RUN_MIGRATIONS: false
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY:-shernoob}"
+      MQTT_URL: mqtt://sound-ai-mqtt:1883
+      MQTT_USERNAME: noob
+      MQTT_PASSWORD: noob
+  frontend:
+    image: frontend
+    container_name: sound-ai-fe
+    build: ../frontend
+    depends_on:
+      - web
+    ports:
+      - "${PORT:-4173}:4173"
+    environment:
+      VITE_API_URL: http://sound-ai-web:3000
