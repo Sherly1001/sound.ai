@@ -1,9 +1,8 @@
 import os
-from random import random
 from typing import Any, Callable, Dict, List
 
 import torch
-import urllib.request
+import requests
 
 from .model import Model
 from config import api
@@ -32,7 +31,9 @@ def download_model(model_id: str):
     url = model_download_url(model_id)
     path = model_storage_path(model_id)
 
-    urllib.request.urlretrieve(url, path)
+    res = requests.get(url)
+    with open(path, 'wb') as outfile:
+        outfile.write(res.content)
 
     return load_model_with_path(path)
 
