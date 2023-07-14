@@ -44,6 +44,10 @@ def connect():
     client.on_message = on_message
 
     client.username_pw_set(mqtt_cfg['username'], mqtt_cfg['password'])
+
+    if mqtt_cfg['ssl']:
+        client.tls_set(ca_certs=mqtt_cfg['ssl'])
+
     connect_(client)
 
     return client
