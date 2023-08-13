@@ -149,13 +149,13 @@ export class ResultService {
     byUserId: string = null,
     byDeviceId: string = null,
   ) {
-    const record = await this.recordService.getRecord(recordId);
-    const fft = await this.recordService.getFft(recordId);
+    const record = await this.recordService.getRecord(recordId, false);
 
     if (!record) {
       throw new NotFoundException('Record not found');
     }
 
+    const fft = await this.recordService.getFft(recordId);
     const res = (await this.mqttService.publishAndWait(
       MqttService.topicPredictReq,
       {

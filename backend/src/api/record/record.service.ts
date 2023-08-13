@@ -70,20 +70,27 @@ export class RecordService {
     return await query.getManyAndCount();
   }
 
-  async getRecord(recordId: string) {
+  async getRecord(recordId: string, getResults: boolean = true) {
     const query = this.recordRepo
       .createQueryBuilder()
-      .where('Record.recordId = :recordId', { recordId })
-      .leftJoinAndSelect('Record.device', 'Device')
-      .leftJoinAndSelect('Record.results', 'DiagnosticResult')
-      .leftJoinAndSelect('DiagnosticResult.model', 'Model')
-      .leftJoinAndSelect('DiagnosticResult.scores', 'Score')
-      .leftJoinAndSelect('DiagnosticResult.diagnosticByUser', 'User')
-      .leftJoinAndSelect('DiagnosticResult.diagnosticByDevice', 'ResultDevice')
-      .leftJoinAndSelect('Model.type', 'ModelType')
-      .leftJoinAndSelect('Score.label', 'Label')
-      .addOrderBy('DiagnosticResult.timestamp', 'DESC')
-      .addOrderBy('Label.labelName', 'ASC');
+      .where('Record.recordId = :recordId', { recordId });
+
+    if (getResults) {
+      query
+        .leftJoinAndSelect('Record.device', 'Device')
+        .leftJoinAndSelect('Record.results', 'DiagnosticResult')
+        .leftJoinAndSelect('DiagnosticResult.model', 'Model')
+        .leftJoinAndSelect('DiagnosticResult.scores', 'Score')
+        .leftJoinAndSelect('DiagnosticResult.diagnosticByUser', 'User')
+        .leftJoinAndSelect(
+          'DiagnosticResult.diagnosticByDevice',
+          'ResultDevice',
+        )
+        .leftJoinAndSelect('Model.type', 'ModelType')
+        .leftJoinAndSelect('Score.label', 'Label')
+        .addOrderBy('DiagnosticResult.timestamp', 'DESC')
+        .addOrderBy('Label.labelName', 'ASC');
+    }
 
     return await query.getOne();
   }
